@@ -7,6 +7,8 @@
 
 require('./bootstrap');
 
+// 作成したJSファイルを読み込む
+
 window.Vue = require('vue');
 
 /**

@@ -1,0 +1,20 @@
+.link {
+  fill: none;
+  stroke: #555;
+  /*stroke-opacity: 0.4;*/
+  stroke-width: 2px;
+}
+
+.rect {
+  fill: turquoise;
+  stroke: turquoise;
+  rx: 4;
+  ry: 4;
+}
+
+/*選択されたノードの表示を変更するclass*/
+.active {
+  stroke: magenta;
+  stroke-width: 2px;
+}
+
