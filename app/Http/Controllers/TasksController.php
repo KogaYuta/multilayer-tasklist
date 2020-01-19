@@ -70,24 +70,74 @@ class TasksController extends Controller
     
     
     // ajaxでアクセスした場合のメソッド
-    // postでajax/tasks/にアクセスされた場合の「新規登録処理」
-    public function ajaxStore(Request $request) //Request $request
+    // postでajax/tasks/にアクセスされた場合の処理
+    public function ajaxCRUD(Request $request) //Request $request
     {
         //タスクを追加する処理
         //['project_id', 'parent_id', 'project_flag', 'content', 'selected']を送信する
-        // jsonメソッドの第一引数が$.ajaxのdoneメソッドのコールバック関数の第一引数に入る
-        $task = $request->task;
         
-        Task::create([
-            'project_id'=>$task['project_id'],
-            'parent_id'=>$task['parent_id'], 
-            'project_flag'=>$task['project_flag'],
-            'content'=>$task['content'],
-            'selected'=>$task['selected']
-        ]);
+        $status = $request->status;
         
-        $tasks = Task::all();
-        // return response()->json($tasks, \Illuminate\Http\Response::HTTP_OK);
-        return $tasks;
+        // タスクを新規登録する処理
+        if ($status === 'create') {
+            $task = $request->task;
+        
+            Task::create([
+                'project_id'=>$task['project_id'],
+                'parent_id'=>$task['parent_id'], 
+                'project_flag'=>$task['project_flag'],
+                'content'=>$task['content'],
+                'selected'=>$task['selected']
+            ]);
+            
+            // 削除後の全タスクを返す
+            $tasks = Task::all();
+            return $tasks;
+            }
+            
+        else if ($status === 'delete') {
+            $id = $request->id;
+            $id = (int)$id;
+            
+            // 指定したタスクを削除する処理
+            $task = Task::find($id);
+            // $tasks = Task::all();
+            // // 削除するタスクの子のタスクを全て削除
+            // foreach($tasks as $t) {
+            //     if ($t->parent_id == $id) {
+            //         $t->delete();
+            //     }  
+            // };
+            
+            $task->delete();
+            
+            // 削除後の全タスクを返す
+            $tasks = Task::all();
+            return $tasks;
+            
+        } else if ($status === 'update') {
+            $id = $request->id;
+            $id = (int)$id;
+            
+            $content = $request->content;
+            
+            // 指定したタスクのcontentを更新する処理
+            $task = Task::find($id);
+            $task->content = $content;
+            $task->save();
+            
+            // 削除後の全タスクを返す
+            $tasks = Task::all();
+            return $tasks;
+        }
+        
     }
 }
+
+// default以外のノードを削除する
+// use App\Task;
+// Task::all();
+// $a = range(109,110);
+// $task = Task::find($a);
+// foreach($task as $t){$t->delete();}
+// Task::all();

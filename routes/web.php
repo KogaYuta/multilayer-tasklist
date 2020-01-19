@@ -15,4 +15,4 @@ Route::get('/', 'TasksController@index');
 
 Route::resource('tasks', 'TasksController');
 
-Route::post('ajax/tasks', 'TasksController@ajaxStore');
+Route::post('ajax/tasks', 'TasksController@ajaxCRUD');
