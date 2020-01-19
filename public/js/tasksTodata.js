@@ -143,23 +143,18 @@ const calcLayer = (tasks, id) => {
     }
     
     let currentTasks = getTaskById(tasks, id);
-    console.log("======calcLayer Start=====");
     
     if (currentTasks.parent_id == projectId && currentTasks.id == projectId) {
-        console.log("======calcLayer End=====");
         return 0;
     } else {
         let i = 0;
         while (flag) {
-          console.log("i",i);
-          console.log("currentTasks", currentTasks);
           if (currentTasks.parent_id != projectId) {
               let tempId = currentTasks.parent_id;
               currentTasks = getTaskById(tasks, tempId);
               layer++;
           } else {
               flag = false;
-              console.log("======calcLayer End=====");
               return layer;
           }
           i++;
@@ -194,13 +189,9 @@ const getPathId = (tasks,dataTree, id) => {
         }
     }
     
-    console.log("=======getPathId start=======");
-    console.log("id", id);
     let currentTasks = getTaskById(tasks, id);
     
-    console.log("currentTasks", currentTasks);
     if (currentTasks.parent_id == projectId && currentTasks.id == projectId) {
-        console.log("=======getPathId end=======");
         return 0;
     } else {
         while (flag) {
@@ -212,7 +203,6 @@ const getPathId = (tasks,dataTree, id) => {
             } else {
                 flag = false;
                 ind.unshift(projectId);
-                console.log("=======getPathId end=======");
                 return ind;
             }
             
@@ -269,7 +259,6 @@ const getProjectTaskId = (tasks) => {
 
 const createData = (tasks) => {
     
-    console.log("createData start");
     let data = {};
     
     const parentIdList = createParentIdList(tasks);
@@ -324,7 +313,6 @@ const createData = (tasks) => {
             
         }
     }
-    console.log("createData end");
     return data;
 };
 

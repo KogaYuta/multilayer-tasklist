@@ -84,15 +84,6 @@ let tasks_debug = [
     },
 ];
 
-let tasks = $('#js-getTasks').data().task;
-console.log(tasks);
-
-// tasksからdataに変換する
-// 親タスクから順に作る
-// ①同じparent_idをもつ配列dataTreeを作る
-// ②親から順にdataを作成する
-
-
 const createParentIdList = (tasks) => {
     
     let parentIdList = []; //親タスクのidを追加する
@@ -152,21 +143,29 @@ const calcLayer = (tasks, id) => {
     }
     
     let currentTasks = getTaskById(tasks, id);
+    console.log("======calcLayer Start=====");
     
     if (currentTasks.parent_id == projectId && currentTasks.id == projectId) {
+        console.log("======calcLayer End=====");
         return 0;
     } else {
+        let i = 0;
         while (flag) {
+          console.log("i",i);
+          console.log("currentTasks", currentTasks);
           if (currentTasks.parent_id != projectId) {
               let tempId = currentTasks.parent_id;
               currentTasks = getTaskById(tasks, tempId);
               layer++;
           } else {
               flag = false;
+              console.log("======calcLayer End=====");
               return layer;
           }
+          i++;
         }
     }
+    
 };
 
 
@@ -185,7 +184,7 @@ const createDepthObject = (tasks) => {
     return depthObject;
 };
 
-const getPathId = (dataTree, id) => {
+const getPathId = (tasks,dataTree, id) => {
     let ind = [id];
     let flag = true;
     let projectId = -1;
@@ -195,9 +194,13 @@ const getPathId = (dataTree, id) => {
         }
     }
     
+    console.log("=======getPathId start=======");
+    console.log("id", id);
     let currentTasks = getTaskById(tasks, id);
     
+    console.log("currentTasks", currentTasks);
     if (currentTasks.parent_id == projectId && currentTasks.id == projectId) {
+        console.log("=======getPathId end=======");
         return 0;
     } else {
         while (flag) {
@@ -209,6 +212,7 @@ const getPathId = (dataTree, id) => {
             } else {
                 flag = false;
                 ind.unshift(projectId);
+                console.log("=======getPathId end=======");
                 return ind;
             }
             
@@ -217,11 +221,13 @@ const getPathId = (dataTree, id) => {
     
 };
 
-const getPathInd = (dataTree, depthObject, id) => {
+const getPathInd = (tasks, dataTree, depthObject, id) => {
     // depth: depthObject
     let ind = [0];
-    let pathId = getPathId(dataTree, id);
+    let pathId = getPathId(tasks, dataTree, id);
+    console.log("pathID", pathId);
     let n = pathId.length;
+    
     
     // 階層方向にloop
     // 2階層目以降
@@ -263,6 +269,10 @@ const getProjectTaskId = (tasks) => {
 };
 
 const createData = (tasks) => {
+    
+    console.log("createData start");
+    let data = {};
+    
     const parentIdList = createParentIdList(tasks);
     const dataTree = createDataTree(tasks, parentIdList);
     const depthObject = createDepthObject(tasks);
@@ -298,7 +308,7 @@ const createData = (tasks) => {
                     temp.name = getTaskById(tasks, id).content; //idから取得する関数に変える
                 }
                 
-                let ind = getPathInd(dataTree, depthObject, id);
+                let ind = getPathInd(tasks, dataTree, depthObject, id);
                 let l = ind.length -1;
                 
                 let currentData = data;
@@ -315,17 +325,10 @@ const createData = (tasks) => {
             
         }
     }
+    console.log("createData end");
+    return data;
 };
 
 
-// data作成
-let start = performance.now();
-// グローバル変数を用意
-var data = {};
 
-createData(tasks);
-console.log("data:",data);
-let end = performance.now();
-let time = "calc time: " + (end - start) + "ms";
-console.log(time);
 

@@ -90,7 +90,7 @@ class TasksController extends Controller
                 'selected'=>$task['selected']
             ]);
             
-            // 削除後の全タスクを返す
+            // 作成後の全タスクを返す
             $tasks = Task::all();
             return $tasks;
             }
@@ -137,7 +137,7 @@ class TasksController extends Controller
 // default以外のノードを削除する
 // use App\Task;
 // Task::all();
-// $a = range(109,110);
+// $a = range(86,107);
 // $task = Task::find($a);
 // foreach($task as $t){$t->delete();}
 // Task::all();
