@@ -70,6 +70,13 @@ class TasksController extends Controller
     
     
     // ajaxでアクセスした場合のメソッド
+    // getでajax/tasks/にアクセスされた場合の処理
+    public function ajaxIndex(Request $request)
+    {
+        $tasks = Task::all();
+        return $tasks;
+    }
+    
     // postでajax/tasks/にアクセスされた場合の処理
     public function ajaxCRUD(Request $request) //Request $request
     {
@@ -137,7 +144,7 @@ class TasksController extends Controller
 // default以外のノードを削除する
 // use App\Task;
 // Task::all();
-// $a = range(86,107);
+// $a = range(108,112);
 // $task = Task::find($a);
 // foreach($task as $t){$t->delete();}
 // Task::all();

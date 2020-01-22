@@ -12,7 +12,7 @@
                 <ul class="dropdwn_menu">
                     <li><a id="addTask" href="#">追加</a></li>
                     <li><a id="deleteTask" href="#">削除</a></li>
-                    <li><input type="text"><a id="updateTask" href="#">更新</a></li>
+                    <li><input type="text"><a id="updateTask" href="#" value="">更新</a></li>
                 </ul>
             </li>
         </ul>

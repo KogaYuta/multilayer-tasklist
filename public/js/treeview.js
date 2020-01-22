@@ -246,7 +246,6 @@ const DeleteData = (e) => {
         }
     }
     
-    
     // dataからタスクを削除
     if (l == 1) {
         // currentDataは親タスクのオブジェクト
@@ -301,6 +300,7 @@ const UpdateData = (e) => {
     // dataのタスク名を変更
     const content = $('.dropdwn_menu input').val();
     currentData.name = content;
+    $('.dropdwn_menu input').val("");
     
     ajaxUpdate(id, content);
 };
@@ -433,15 +433,6 @@ const createNode = (temp) => {
 const changeTree = () => {
     //今までの表示を削除
     $('svg > g').remove();
-    
-    // サーバから取得したtasks
-    // let tasks = document.getElementById('js-getTasks').getAttribute('data-task');
-    // tasks = JSON.parse(tasks);
-    // console.log("tasks",tasks);
-    
-    // tasksの変更をdataに反映
-    // data = createData(tasks);
-    // console.log("data", data);
     
     // ノードを結ぶ線を作成
     let temp = createLink();
