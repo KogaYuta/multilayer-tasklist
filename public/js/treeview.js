@@ -324,7 +324,7 @@ const ajaxUpdate = (id, content, project_id) => {
     .done(function(data) {
         console.log("success update");
         let temp = JSON.stringify(data);
-        console.log("temp",temp);
+        console.log("temp",temp)
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
         // window.location.reload(false);
     })
@@ -586,6 +586,8 @@ const changeTree = () => {
     
     // ノードを作成
     createNode(temp);
+    
+    window.location.reload(true);
         
 };
 
