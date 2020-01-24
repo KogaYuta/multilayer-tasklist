@@ -139,6 +139,27 @@ const prepareChangeData = (e) => {
     return temp;
 };
 
+const ajaxIndex = () => {
+    // AjaxでTasksControllerのstoreメソッドを呼ぶ
+    $.ajax({
+        url: 'ajax/',
+        type: 'GET',
+    })
+    // Ajaxリクエストが成功した場合
+    .done(function(data) {
+        console.log("add success");
+        let temp = JSON.stringify(data);
+        console.log("data",data);
+        console.log("data-task", temp);
+        document.getElementById("js-getTasks").setAttribute('data-task', temp);
+    })
+    // Ajaxリクエストが失敗した場合
+    .fail(function(data) {
+        console.log("add error");
+        alert(data.responseJSON);
+    });
+};
+
 // ajaxでstoreメソッドを実行する関数
 const ajaxStore = (taskTemp) => {
     // AjaxでTasksControllerのstoreメソッドを呼ぶ
@@ -146,13 +167,13 @@ const ajaxStore = (taskTemp) => {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'ajax/',
+        url: 'https://multilayer-tasklist.herokuapp.com/tasks/ajax/',
         type: 'POST',
         data: {'task':taskTemp, '_method': 'POST', status:"create"},
     })
     // Ajaxリクエストが成功した場合
     .done(function(data) {
-        console.log("add success");
+        console.log("ind success");
         let temp = JSON.stringify(data);
         console.log("data",data);
         console.log("data-task", temp);
@@ -203,6 +224,7 @@ const AddData = (e) => {
     
     // ajaxでサーバーに登録
     ajaxStore(taskTemp);
+    // ajaxIndex();
     
 };
 

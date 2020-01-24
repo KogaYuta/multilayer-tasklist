@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Task;
+use App\User;
 
 class TasksController extends Controller
 {
@@ -91,9 +92,11 @@ class TasksController extends Controller
     {
         if (\Auth::check()) {
             $user = \Auth::user();
-            $projects = $user->projects()->with(['tasks'])->get();
-            
-            return $tasks;
+            $projects = $user->projects()->get();
+            return $projects;
+        } else {
+            $users = User::all();
+            return $users;
         }
     }
     
