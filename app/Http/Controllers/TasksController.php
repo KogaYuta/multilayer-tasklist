@@ -123,7 +123,9 @@ class TasksController extends Controller
                 
                 // 作成後の全タスクを返す
                 $tasks = $project->tasks()->get();
-                return $tasks;
+                $data =[$user, $project];
+                // return $tasks;
+                return $data;
                 
             }  else if ($status === 'delete') {
                 $id = $request->id;
