@@ -178,6 +178,7 @@ const ajaxStore = (taskTemp) => {
         console.log("data",data);
         console.log("data-task", temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
+        window.location.reload(false);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -244,6 +245,7 @@ const ajaxDelete = (id,project_id) => {
         console.log("success delete");
         let temp = JSON.stringify(data);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
+        window.location.reload(false);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -322,6 +324,7 @@ const ajaxUpdate = (id, content, project_id) => {
         console.log("success update");
         let temp = JSON.stringify(data);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
+        window.location.reload(false);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -443,7 +446,7 @@ const EventDropdwn = (event) => {
         $('.dropdwn').hide();
         changeTree();
         // ページを再読み込み
-        // window.location.reload(false);
+        window.location.reload(false);
     });
     
     $('#deleteTask').off('click');
