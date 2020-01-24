@@ -142,7 +142,7 @@ const prepareChangeData = (e) => {
 const ajaxIndex = () => {
     // AjaxでTasksControllerのstoreメソッドを呼ぶ
     $.ajax({
-        url: 'ajax/',
+        url: 'ajax',
         type: 'GET',
     })
     // Ajaxリクエストが成功した場合
@@ -235,7 +235,7 @@ const ajaxDelete = (id,project_id) => {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'ajax/',
+        url: 'ajax',
         type: 'POST',
         data: {'id':id, 'project_id':project_id, '_method': 'POST', status:"delete"},
     })
@@ -307,7 +307,7 @@ const ajaxUpdate = (id, content, project_id) => {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'ajax/',
+        url: 'ajax',
         type: 'POST',
         data: {
                 'id':id, 
