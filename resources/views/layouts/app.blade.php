@@ -8,7 +8,7 @@
         <!--JS側の設定も必要-->
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="{{ secure_asset('/css/main.css') }}">
     </head>
 
     <body>
@@ -28,8 +28,8 @@
         <!--d3.js-->
         <script src="https://d3js.org/d3.v5.min.js"></script>
         
-        <script type="text/javascript" src="js/tasksTodata.js"></script>
-        <script type="text/javascript" src="js/treeview.js"></script>
+        <script type="text/javascript" src="{{ secure_asset('/js/tasksTodata.js') }}"></script>
+        <script type="text/javascript" src="{{ secure_asset('/js/treeview.js') }}"></script>
         <!--<script type="text/javascript" src="js/integrated.js"></script>-->
     </body>
 </html>

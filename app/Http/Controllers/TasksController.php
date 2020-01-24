@@ -8,12 +8,43 @@ use App\Task;
 
 class TasksController extends Controller
 {
-    // getでtasks/にアクセスされた場合の「一覧表示処理」
+    // 全てのprojectと各projectに紐付く全てのtaskを取得する
     public function index()
     {
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            
+            $projects = $user->projects()->with(['tasks'])->get();
+            
+            $data = [
+                'user' => $user,
+                'projects' => $projects,
+            ];
+            
+        }
+        
+        return view('welcome', $data);
+    }
+    
+    // タスクツリー作成画面に移動する
+    public function tree(Request $request) {
+        // $id : projectのid
+        // projectに紐付くtaskを全て取得
         $tasks = Task::all();
-        return view('tasks.index', [
-            'tasks' => $tasks,    
+        
+        $taskinProject = array();
+        foreach ($tasks as $task) {
+            if ($request->id == $task->project_id) {
+                $taskinProject[] = $task;
+            }
+        }
+        
+        $tasksString = json_encode($taskinProject);
+        
+        return view('tasks.tree',[
+            'tasks' => $taskinProject,
+            'tasksString' => $tasksString 
         ]);
     }
 
@@ -23,25 +54,10 @@ class TasksController extends Controller
         //
     }
 
-    // postでtasks/にアクセスされた場合の「新規登録処理」
+    // Projectを作成した時に同名の親タスク(ツリーの根)を作成する
     public function store(Request $request) //Request $request
     {
-        //タスクを追加する処理
-        //['project_id', 'parent_id', 'project_flag', 'content', 'selected']を送信する
-        // jsonメソッドの第一引数が$.ajaxのdoneメソッドのコールバック関数の第一引数に入る
-        $task = $request->task;
         
-        Task::create([
-            'project_id'=>$task['project_id'],
-            'parent_id'=>$task['parent_id'], 
-            'project_flag'=>$task['project_flag'],
-            'content'=>$task['content'],
-            'selected'=>$task['selected']
-        ]);
-        
-        $tasks = Task::all();
-        // return response()->json($tasks, \Illuminate\Http\Response::HTTP_OK);
-        return $tasks;
     }
 
     // getでtasks/idにアクセスされた場合の「取得表示処理」
@@ -73,8 +89,12 @@ class TasksController extends Controller
     // getでajax/tasks/にアクセスされた場合の処理
     public function ajaxIndex(Request $request)
     {
-        $tasks = Task::all();
-        return $tasks;
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $projects = $user->projects()->with(['tasks'])->get();
+            
+            return $tasks;
+        }
     }
     
     // postでajax/tasks/にアクセスされた場合の処理
@@ -83,61 +103,73 @@ class TasksController extends Controller
         //タスクを追加する処理
         //['project_id', 'parent_id', 'project_flag', 'content', 'selected']を送信する
         
-        $status = $request->status;
+        if (\Auth::check()) {
+            $status = $request->status;
         
-        // タスクを新規登録する処理
-        if ($status === 'create') {
-            $task = $request->task;
-        
-            Task::create([
-                'project_id'=>$task['project_id'],
-                'parent_id'=>$task['parent_id'], 
-                'project_flag'=>$task['project_flag'],
-                'content'=>$task['content'],
-                'selected'=>$task['selected']
-            ]);
-            
-            // 作成後の全タスクを返す
-            $tasks = Task::all();
-            return $tasks;
+            // タスクを新規登録する処理
+            if ($status === 'create') {
+                
+                $user = \Auth::user();
+                $task = $request->task;
+                $project_id = $task['project_id'];
+                $project = $user->projects()->get()->find($project_id);
+                
+                $project->tasks()->create([
+                    'parent_id'=>$task['parent_id'], 
+                    'project_flag'=>$task['project_flag'],
+                    'content'=>$task['content'],
+                    'selected'=>$task['selected']
+                ]);
+                
+                // 作成後の全タスクを返す
+                $tasks = $project->tasks()->get();
+                return $tasks;
+                
+                }
+                
+            else if ($status === 'delete') {
+                $id = $request->id;
+                $id = (int)$id;
+                $project_id = $request->project_id;
+                $project_id = (int)$project_id;
+                
+                $user = \Auth::user();
+                $project = $user->projects()->get()->find($project_id);
+                $task = $project->tasks()->get()->find($id);
+                
+                // タスクを削除
+                $task->delete();
+                
+                // 作成後の全タスクを返す
+                $tasks = $project->tasks()->get();
+                return $tasks;
+                
+                
+                
+            } else if ($status === 'update') {
+                
+                $id = $request->id;
+                $id = (int)$id;
+                $project_id = $request->project_id;
+                $project_id = (int)$project_id;
+                $content = $request->content;
+                
+                $user = \Auth::user();
+                $project = $user->projects()->get()->find($project_id);
+                $task = $project->tasks()->get()->find($id);
+                
+                // タスクを削除
+                $task->content = $content;
+                $task->save();
+                
+                // 作成後の全タスクを返す
+                $tasks = $project->tasks()->get();
+                return $tasks;
+                
+            } else if ($status === 'select') {
+                
             }
-            
-        else if ($status === 'delete') {
-            $id = $request->id;
-            $id = (int)$id;
-            
-            // 指定したタスクを削除する処理
-            $task = Task::find($id);
-            // $tasks = Task::all();
-            // // 削除するタスクの子のタスクを全て削除
-            // foreach($tasks as $t) {
-            //     if ($t->parent_id == $id) {
-            //         $t->delete();
-            //     }  
-            // };
-            
-            $task->delete();
-            
-            // 削除後の全タスクを返す
-            $tasks = Task::all();
-            return $tasks;
-            
-        } else if ($status === 'update') {
-            $id = $request->id;
-            $id = (int)$id;
-            
-            $content = $request->content;
-            
-            // 指定したタスクのcontentを更新する処理
-            $task = Task::find($id);
-            $task->content = $content;
-            $task->save();
-            
-            // 削除後の全タスクを返す
-            $tasks = Task::all();
-            return $tasks;
         }
-        
     }
 }
 
@@ -148,3 +180,16 @@ class TasksController extends Controller
 // $task = Task::find($a);
 // foreach($task as $t){$t->delete();}
 // Task::all();
+
+// 親ノード以外削除
+// use App\User;
+// use App\Project;
+// use App\Task;
+// $user = User::find(2);
+// $projects = $user->projects()->get();
+// $project = $projects[1];
+// $tasks = $project->tasks()->get();
+// $a = range(109,136);
+// $tasks = $project->tasks()->get()->find($a);
+// foreach ($tasks as $task) {$task->delete();}
+// $project->tasks()->get();

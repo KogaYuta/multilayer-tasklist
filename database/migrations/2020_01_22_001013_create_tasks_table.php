@@ -19,7 +19,7 @@ class CreateTasksTable extends Migration
              $table->integer('project_id')->unsigned()->index();
              $table->boolean('project_flag');
              $table->boolean('selected');
-             $table->integer('parent_id');
+             $table->integer('parent_id')->nullable();
              $table->timestamps();
             
              $table->foreign('project_id')->references('id')->on('projects');

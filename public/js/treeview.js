@@ -33,7 +33,7 @@ const defineX = (wholeData, eachData, spaceInfo) => {
     //最上位から現在のデータまでの最短ルートを取得
     const path = wholeData.path(eachData);
     //渡された元データがJSONのままなのでHierarchy形式に変換
-    const wholeTree = wholeData.descendants()
+    const wholeTree = wholeData.descendants();
     //経由する各ノードのある階層から、経由地点より上に位置する末端ノードの個数を合計
     const leaves = path.map((ancestor) => {
         //経由地点のある階層のうちで親が同じデータを抽出
@@ -58,10 +58,10 @@ const definePos = (spaceInfo) => {
         d.y = spaceInfo.padding + d.depth * spaceInfo.width;
         const sum = defineX(treeData, d, spaceInfo);
         d.x = spaceInfo.padding + sum * spaceInfo.height;
-    })
+    });
     
     return treeData;
-}
+};
 
 //選択されたノードに対応するdataのindexを返す関数
 const getObjectPath = (e) => {
@@ -74,7 +74,7 @@ const getObjectPath = (e) => {
         let currentName = currentNode.data.name;
         path.unshift(currentName); //配列の先頭に要素を追加
         currentNode = currentNode.parent;//１つ親ノードに遡る
-    };
+    }
   
     const pathLen = path.length;
     let currentChildren = data.children;   
@@ -88,12 +88,12 @@ const getObjectPath = (e) => {
             //pathと同じ名前があれば、その指標を記録
             if (currentChildren[j].name === path[i]) {
                 ind.push(j);
-            };
-        };
+            }
+        }
     
         // 次の階層に移動
         currentChildren = currentChildren[ind[i]].children;
-    };
+    }
     return ind;
 };
 
@@ -120,8 +120,12 @@ const prepareChangeData = (e) => {
     const parentIdList = createParentIdList(tasks);
     const dataTree = createDataTree(tasks, parentIdList);
     const depthObject = createDepthObject(tasks);
-    console.log("id",id);
     const ind = getPathInd(tasks,dataTree, depthObject, id);
+    
+    console.log("id", id);
+    console.log("dataTree", dataTree);
+    console.log("depthObject", depthObject);
+    console.log("ind",ind);
     
     const temp = {
         ind: ind,
@@ -139,7 +143,7 @@ const ajaxStore = (taskTemp) => {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'ajax/tasks/',
+        url: 'ajax/',
         type: 'POST',
         data: {'task':taskTemp, '_method': 'POST', status:"create"},
     })
@@ -147,7 +151,6 @@ const ajaxStore = (taskTemp) => {
     .done(function(data) {
         console.log("add success");
         let temp = JSON.stringify(data);
-        console.log(temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
     })
     // Ajaxリクエストが失敗した場合
@@ -171,7 +174,7 @@ const AddData = (e) => {
     // 最初はプロジェクトノードを示し、必ず0なので無視する
     for(let i=1;i<n;i++){
         currentData = currentData.children[ind[i]];
-    };
+    }
     
     //dataにノードを追加
     //直接dataにアクセスできないので、currentDataからアクセス
@@ -181,6 +184,8 @@ const AddData = (e) => {
     } else {
         currentData['children'] = [{"name": content}];
     }
+    
+    console.log("temp",temp);
     
     // サーバーに渡すオブジェクト
     const taskTemp = {
@@ -197,21 +202,20 @@ const AddData = (e) => {
 };
 
 // ajaxでdeleteメソッドを実行する関数
-const ajaxDelete = (id) => {
+const ajaxDelete = (id,project_id) => {
     // AjaxでTasksControllerのstoreメソッドを呼ぶ
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'ajax/tasks/',
+        url: 'ajax/',
         type: 'POST',
-        data: {'id':id, '_method': 'POST', status:"delete"},
+        data: {'id':id, 'project_id':project_id, '_method': 'POST', status:"delete"},
     })
     // Ajaxリクエストが成功した場合
     .done(function(data) {
         console.log("success delete");
         let temp = JSON.stringify(data);
-        console.log(temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
     })
     // Ajaxリクエストが失敗した場合
@@ -224,6 +228,7 @@ const ajaxDelete = (id) => {
 const DeleteData = (e) => {
     const temp = prepareChangeData(e);
     const id = temp.task.id;
+    const project_id = temp.task.project_id;
     const ind = temp.ind;
     
     let n = ind.length;
@@ -236,6 +241,7 @@ const DeleteData = (e) => {
         if (i == n-1) {
             // 同階層に存在するタスクの数
             l = currentData.children.length;
+            
             if (l != 1) {
                 // 同階層に複数タスクが存在する場合は、そのタスクが存在する配列を返す
                 // １つしかない場合は、親タスクのオブジェクトを返す
@@ -246,33 +252,48 @@ const DeleteData = (e) => {
         }
     }
     
+    console.log("id",id);
+    console.log("ind", ind);
+    console.log("currentData before delete",currentData);
+    
     // dataからタスクを削除
     if (l == 1) {
         // currentDataは親タスクのオブジェクト
         delete currentData.children;
     } else {
         // currentDataは選択されたタスクが含まれる配列
-        currentData.splice(ind.slice(-1)[0],1);
+        // currentIndは削除対象のタスクのindex
+        let currentInd = ind.slice(-1)[0];
+        
+        currentData.splice(currentInd,1);
     }
-    ajaxDelete(id);
+    
+    console.log("currentData after delete", currentData);
+    
+    ajaxDelete(id, project_id);
     
 };
 
-const ajaxUpdate = (id, content) => {
+const ajaxUpdate = (id, content, project_id) => {
     // AjaxでTasksControllerのstoreメソッドを呼ぶ
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'ajax/tasks/',
+        url: 'ajax/',
         type: 'POST',
-        data: {'id':id, 'content':content, '_method': 'POST', status:"update"},
+        data: {
+                'id':id, 
+                'content':content, 
+                'project_id':project_id, 
+                '_method': 'POST', 
+                status:"update"
+        },
     })
     // Ajaxリクエストが成功した場合
     .done(function(data) {
         console.log("success update");
         let temp = JSON.stringify(data);
-        console.log(temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
     })
     // Ajaxリクエストが失敗した場合
@@ -285,6 +306,7 @@ const UpdateData = (e) => {
     const temp = prepareChangeData(e);
     const id = temp.task.id;
     const ind = temp.ind;
+    const project_id = temp.task.project_id;
     
     let n = ind.length;
     let currentData = data; //dataはグローバル変数
@@ -302,8 +324,53 @@ const UpdateData = (e) => {
     currentData.name = content;
     $('.dropdwn_menu input').val("");
     
-    ajaxUpdate(id, content);
+    ajaxUpdate(id, content, project_id);
 };
+
+const ajaxSelect = (id) => {
+    // AjaxでTasksControllerのstoreメソッドを呼ぶ
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: 'ajax/',
+        type: 'POST',
+        data: {'id':id,  '_method': 'POST', status:"select"},
+    })
+    // Ajaxリクエストが成功した場合
+    .done(function(data) {
+        // selected = 1のtaskのスタイルを変更する処理
+    })
+    // Ajaxリクエストが失敗した場合
+    .fail(function(data) {
+        alert(data.responseJSON);
+    });
+};
+
+const SelectData = (e) => {
+    // e : D3.jsのイベントオブジェクト
+    
+    const temp = prepareChangeData(e);
+    const id = temp.task.id;
+    const ind = temp.ind;
+    
+    let n = ind.length;
+    let currentData = data; //dataはグローバル変数
+    
+    console.log("ind",ind);
+    console.log("n",n);
+    
+    // 選択したタスクオブジェクトを取得する
+    for(let i=1;i<n;i++){
+        currentData = currentData.children[ind[i]];
+    }
+    
+    // dataのスタイルを変更
+    
+    
+    ajaxSelect(id);
+};
+
 
 // ドロップダウンメニューのスタイルを変更
 const styleDropdwn = (e) => {
@@ -333,28 +400,71 @@ const styleDropdwn = (e) => {
 };
 
 //ドロップダウンメニューにイベントを登録
+// 再読みこみしないとメニューを開いたまま固まるエラーが発生している
+// なのでlocation.reload()によりページを再読み込みしている
 const EventDropdwn = (event) => {
-    // eventはタスクをクリックした時のイベントオブジェクト
+    // eventはタスクをクリックした時のイベントオブジェクト(D3.js)
     $('#addTask').off('click');
-    $('#addTask').on('click',()=>{
+    $('#addTask').on('click',(e)=>{
+        // aタグのページ遷移を無効化
+        e.preventDefault();
+        // 編集結果をフロントエンド, バックエンド、両者に反映
+        // フロントエンドはキャッシュ(data)を変更
+        // バックエンドはサーバーにajaxでアクセスして変更
         AddData(event);
+        // メニューを隠す
         $('.dropdwn').hide();
         changeTree();
+        // ページを再読み込み
+        // window.location.reload(false);
     });
     
     $('#deleteTask').off('click');
-    $('#deleteTask').on('click',()=>{
+    $('#deleteTask').on('click',(e)=>{
+        // aタグのページ遷移を無効化
+        e.preventDefault();
+        // 編集結果をフロントエンド, バックエンド、両者に反映
+        // フロントエンドはキャッシュ(data)を変更
+        // バックエンドはサーバーにajaxでアクセスして変更
         DeleteData(event);
+        // メニューを隠す
         $('.dropdwn').hide();
         changeTree();
+        // ページを再読み込み
+        window.location.reload(false);
     });
     
     $('#updateTask').off('click');
-    $('#updateTask').on('click',()=>{
+    $('#updateTask').on('click',(e)=>{
+        // aタグのページ遷移を無効化
+        e.preventDefault();
+        // 編集結果をフロントエンド, バックエンド、両者に反映
+        // フロントエンドはキャッシュ(data)を変更
+        // バックエンドはサーバーにajaxでアクセスして変更
         UpdateData(event);
+        // メニューを隠す
         $('.dropdwn').hide();
+        // 表示を変更する
         changeTree();
+        // ページを再読み込み
+        window.location.reload(false);
     });
+    
+    // $('#selectTask').off('click');
+    // $('#selectTask').on('click',(e)=>{
+    //     // aタグのページ遷移を無効化
+    //     e.preventDefault();
+    //     // 編集結果をフロントエンド, バックエンド、両者に反映
+    //     // フロントエンドはキャッシュ(data)を変更
+    //     // バックエンドはサーバーにajaxでアクセスして変更
+    //     SelectData(event);
+    //     // メニューを隠す
+    //     $('.dropdwn').hide();
+    //     // 表示を変更する
+    //     changeTree();
+    //     // ページを再読み込み
+    //     window.location.reload(false);
+    // });
 };
 
 // nodeにノード追加イベントを追加する関数
@@ -371,6 +481,8 @@ const AddEvent = (node) => {
             EventDropdwn(e);
             
             $('.dropdwn').toggle();
+            
+            console.log("data",data);
             
         });
 };

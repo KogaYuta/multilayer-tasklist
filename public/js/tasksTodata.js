@@ -211,41 +211,59 @@ const getPathId = (tasks,dataTree, id) => {
     
 };
 
-const getPathInd = (tasks, dataTree, depthObject, id) => {
-    // depth: depthObject
-    let ind = [0];
+
+const getIndOneLayer = (tasks, dataTree, depthObject, id) => {
     let pathId = getPathId(tasks, dataTree, id);
-    let n = pathId.length;
     
     
-    // 階層方向にloop
-    // 2階層目以降
-    for(let i=1;i<n;i++) {
-        let m = depthObject[i].length;
-        let counter = 0;
-        let prevParentId = -1; // 次のif文で必ずfalseにするため
-        
-        for(let j=0;j<m;j++) {
-            
-            let tempId = depthObject[i][j];
-            let tempParentId = convertIdtoTask(tasks, tempId).parent_id;
-            
-            if (prevParentId == tempParentId) {
-                counter++;
-            } else {
-                counter = 0;
-            }
-            
-            if (depthObject[i][j] == pathId[i]) {
-                ind.push(counter);
-            }
-            
-            prevParentId = tempParentId;
+    // 以下、新しい手法
+    // 選択されたtaskの深さ
+    let N = pathId.length-1;
+    // 選択されたtaskの１つ親の層に存在するtaskのidを取得
+    let prevId = depthObject[N-1];
+    let dataDependence = {};
+    // dataDependenceのkeyを作成
+    // keyは１つ親のtaskのid
+    for (let i=0; i<=prevId.length; i++ ) {
+        dataDependence[prevId[i]] = [];
+    }
+    // 選択されたtaskの層に存在するtaskのidを取得
+    let M = depthObject[N].length;
+    // 選択されたtaskの層に存在する各taskをdataDeoendenceに格納する
+    for(let i=0; i<M; i++) {
+        let tempId = depthObject[N][i];
+        let tempTask = getTaskById(tasks, tempId);
+        let parentId = tempTask.parent_id;
+        dataDependence[parentId].push(tempId);
+    }
+    
+    let ind = 0;
+    for(let i in dataDependence) {
+        let temp = dataDependence[i];
+        let result = temp.indexOf(id);
+        if (result > -1) {
+            ind = result;
         }
     }
     
     return ind;
-}
+};
+
+
+const getPathInd = (tasks, dataTree, depthObject, id) => {
+    // depth: depthObject
+    let ind = [0];
+    let pathId = getPathId(tasks, dataTree, id);
+    
+    let n = pathId.length;
+    
+    for(let i=1; i<n; i++) {
+        let tempInd = getIndOneLayer(tasks, dataTree, depthObject, pathId[i]);
+        ind.push(tempInd);
+    }
+    
+    return ind;
+};
 
 
 const getProjectTaskId = (tasks) => {
@@ -279,7 +297,7 @@ const createData = (tasks) => {
             // i=0はprojectしかないので追加
             if (i == 0) {
                 let id = getProjectTaskId(tasks);
-                temp.name=getTaskById(tasks, id).content, //idから取得する関数に変える
+                temp.name=getTaskById(tasks, id).content, 
                 temp.children=[];
                 
                 data = temp;
@@ -290,10 +308,10 @@ const createData = (tasks) => {
                 
                 // jは現在操作するタスクのid
                 if (parentIdList.indexOf(id) != -1) {
-                    temp.name = getTaskById(tasks, id).content; //idから取得する関数に変える
+                    temp.name = getTaskById(tasks, id).content; 
                     temp.children = [];
                 } else {
-                    temp.name = getTaskById(tasks, id).content; //idから取得する関数に変える
+                    temp.name = getTaskById(tasks, id).content; 
                 }
                 
                 let ind = getPathInd(tasks, dataTree, depthObject, id);
