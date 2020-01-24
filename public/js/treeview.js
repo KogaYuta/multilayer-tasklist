@@ -114,6 +114,8 @@ const prepareChangeData = (e) => {
     tasks = JSON.parse(tasks);
     const name = e.data.name;
     const task = dataTotask(name, tasks);
+    console.log("name",name);
+    console.log("task",task);
     
     // indを取得する
     const id = task.id;
