@@ -179,6 +179,7 @@ const ajaxStore = (taskTemp) => {
         console.log("data-task", temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
         // window.location.reload(false);
+        alert("change data-task");
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -246,6 +247,7 @@ const ajaxDelete = (id,project_id) => {
         let temp = JSON.stringify(data);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
         // window.location.reload(false);
+        alert("change data-task");
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -325,6 +327,7 @@ const ajaxUpdate = (id, content, project_id) => {
         let temp = JSON.stringify(data);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
         // window.location.reload(false);
+        alert("change data-task");
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -448,8 +451,10 @@ const EventDropdwn = (event) => {
         // メニューを隠す
         $('.dropdwn').hide();
         changeTree();
+        alert("change tree");
         // ページを再読み込み
         window.location.reload(false);
+        alert("reload");
     });
     
     $('#deleteTask').off('click');
@@ -463,8 +468,10 @@ const EventDropdwn = (event) => {
         // メニューを隠す
         $('.dropdwn').hide();
         changeTree();
+        alert("change tree");
         // ページを再読み込み
         window.location.reload(false);
+        alert("reload");
     });
     
     $('#updateTask').off('click');
@@ -479,8 +486,10 @@ const EventDropdwn = (event) => {
         $('.dropdwn').hide();
         // 表示を変更する
         changeTree();
+        alert("change tree");
         // ページを再読み込み
         window.location.reload(false);
+        alert("reload");
     });
     
     // $('#selectTask').off('click');
