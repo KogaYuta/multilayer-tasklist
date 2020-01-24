@@ -114,6 +114,7 @@ const prepareChangeData = (e) => {
     tasks = JSON.parse(tasks);
     const name = e.data.name;
     const task = dataTotask(name, tasks);
+    console.log("tasks",tasks);
     console.log("name",name);
     console.log("task",task);
     
@@ -153,6 +154,7 @@ const ajaxStore = (taskTemp) => {
     .done(function(data) {
         console.log("add success");
         let temp = JSON.stringify(data);
+        console.log("data-task", temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
     })
     // Ajaxリクエストが失敗した場合
