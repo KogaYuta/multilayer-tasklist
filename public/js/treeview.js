@@ -244,6 +244,7 @@ const ajaxDelete = (id,project_id) => {
     .done(function(data) {
         console.log("success delete");
         let temp = JSON.stringify(data);
+        console.log("temp",temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
         // window.location.reload(false);
     })
@@ -323,6 +324,7 @@ const ajaxUpdate = (id, content, project_id) => {
     .done(function(data) {
         console.log("success update");
         let temp = JSON.stringify(data);
+        console.log("temp",temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
         // window.location.reload(false);
     })
