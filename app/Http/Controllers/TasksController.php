@@ -125,9 +125,7 @@ class TasksController extends Controller
                 $tasks = $project->tasks()->get();
                 return $tasks;
                 
-                }
-                
-            else if ($status === 'delete') {
+            }  else if ($status === 'delete') {
                 $id = $request->id;
                 $id = (int)$id;
                 $project_id = $request->project_id;

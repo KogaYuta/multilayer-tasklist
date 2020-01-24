@@ -197,8 +197,8 @@ const AddData = (e) => {
                         project_id: task.project_id,
                         content:content,
                         parent_id:task.id,
-                        project_flag : 0,
-                        selected : 0
+                        project_flag : false,
+                        selected : false
     };
     
     // ajaxでサーバーに登録
