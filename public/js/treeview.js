@@ -576,7 +576,6 @@ const createNode = (temp) => {
 };
 
 // dataに応じてツリーの表示を変更する関数
-// showTree→AddEvent→changeTree
 const changeTree = () => {
     //今までの表示を削除
     $('svg > g').remove();
@@ -587,7 +586,7 @@ const changeTree = () => {
     // ノードを作成
     createNode(temp);
     
-    // window.location.reload(true);
+    window.location.reload(true);
         
 };
 
