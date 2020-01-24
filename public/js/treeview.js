@@ -167,7 +167,7 @@ const ajaxStore = (taskTemp) => {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        url: 'https://multilayer-tasklist.herokuapp.com/tasks/ajax/',
+        url: 'ajax',
         type: 'POST',
         data: {'task':taskTemp, '_method': 'POST', status:"create"},
     })
