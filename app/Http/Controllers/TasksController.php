@@ -125,10 +125,8 @@ class TasksController extends Controller
                 ]);
                 
                 // 作成後の全タスクを返す
-                $tasks = $project->tasks()->get();
-                $data =[$user, $project];
+                $tasks = $project->tasks()->orderBy('id', 'asc')->get();
                 return $tasks;
-                // return $data;
                 
             }  else if ($status === 'delete') {
                 $id = $request->id;
@@ -144,7 +142,7 @@ class TasksController extends Controller
                 $task->delete();
                 
                 // 作成後の全タスクを返す
-                $tasks = $project->tasks()->get();
+                $tasks = $project->tasks()->orderBy('id', 'asc')->get();
                 return $tasks;
                 
                 
@@ -166,7 +164,7 @@ class TasksController extends Controller
                 $task->save();
                 
                 // 作成後の全タスクを返す
-                $tasks = $project->tasks()->get();
+                $tasks = $project->tasks()->orderBy('id', 'asc')->get();
                 return $tasks;
                 
             } else if ($status === 'select') {
