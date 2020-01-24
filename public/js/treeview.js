@@ -178,7 +178,7 @@ const ajaxStore = (taskTemp) => {
         console.log("data",data);
         console.log("data-task", temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
-        window.location.reload(false);
+        // window.location.reload(false);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -245,7 +245,7 @@ const ajaxDelete = (id,project_id) => {
         console.log("success delete");
         let temp = JSON.stringify(data);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
-        window.location.reload(false);
+        // window.location.reload(false);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -324,7 +324,7 @@ const ajaxUpdate = (id, content, project_id) => {
         console.log("success update");
         let temp = JSON.stringify(data);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
-        window.location.reload(false);
+        // window.location.reload(false);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -354,6 +354,8 @@ const UpdateData = (e) => {
     currentData.name = content;
     $('.dropdwn_menu input').val("");
     
+    // サーバに変更をpost
+    // data-task属性も変更
     ajaxUpdate(id, content, project_id);
 };
 
@@ -441,6 +443,7 @@ const EventDropdwn = (event) => {
         // 編集結果をフロントエンド, バックエンド、両者に反映
         // フロントエンドはキャッシュ(data)を変更
         // バックエンドはサーバーにajaxでアクセスして変更
+        // data-taskも変更
         AddData(event);
         // メニューを隠す
         $('.dropdwn').hide();
