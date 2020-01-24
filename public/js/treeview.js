@@ -587,7 +587,7 @@ const changeTree = () => {
     // ノードを作成
     createNode(temp);
     
-    window.location.reload(true);
+    // window.location.reload(true);
         
 };
 
