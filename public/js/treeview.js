@@ -154,6 +154,7 @@ const ajaxStore = (taskTemp) => {
     .done(function(data) {
         console.log("add success");
         let temp = JSON.stringify(data);
+        console.log("data",data);
         console.log("data-task", temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
     })
