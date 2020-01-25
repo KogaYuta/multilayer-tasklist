@@ -176,6 +176,16 @@ const createDepthObject = (tasks) => {
         }
     }
     
+    // depthObjectの配列の並び順を一定にする
+    // depthObjectはdataの表示順に直結するため
+    // depthObjectの各階層の配列を昇順に並び変える。
+    function compareFunc(a, b) {
+      return a - b;
+    }
+    for(let i in depthObject) {
+        depthObject[i].sort(compareFunc);
+    }    
+    
     console.log("depthObject", depthObject);
     return depthObject;
 };
