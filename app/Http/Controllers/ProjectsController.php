@@ -143,6 +143,19 @@ class ProjectsController extends Controller
             $project->content = $request->content;
             $project->save();
             
+            //親taskの名前も変更する
+            $tasks = $project->tasks()->get();
+            $task = 0;
+            foreach($tasks as $t) {
+                if ($t->project_flag == true) {
+                    $task = $t;
+                }
+            }
+            
+            $taskNew = $project->tasks()->get()->find($task->id);
+            $taskNew->content = $request->content;
+            $taskNew->save();
+            
             return redirect()->action('ProjectsController@index');
         }
     }

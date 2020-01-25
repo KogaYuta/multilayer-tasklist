@@ -415,15 +415,35 @@ const EventDropdwn = (event) => {
     $('#deleteTask').on('click',(e)=>{
         // aタグのページ遷移を無効化
         e.preventDefault();
-        // 編集結果をフロントエンド, バックエンド、両者に反映
-        // フロントエンドはキャッシュ(data)を変更
-        // バックエンドはサーバーにajaxでアクセスして変更
-        DeleteData(event);
-        // メニューを隠す
-        $('.dropdwn').hide();
-        changeTree();
-        // ページを再読み込み
-        // window.location.reload(false);
+        
+        // 子タスクが存在するか確認
+        // 選択されたtaskに子タスクが存在すればtrue
+        let flag = false;
+        let tasks = document.getElementById('js-getTasks').getAttribute('data-task');
+        tasks = JSON.parse(tasks);
+        const name = event.data.name;
+        let task = getTaskByName(tasks,name);
+        for(let i=0;i<tasks.length;i++){
+            if (task.id == tasks[i].parent_id) {
+                flag = true;
+            }
+        }
+        
+        // 末端taskのみ削除許可
+        if (flag) {
+            alert("末端のタスクのみ削除可能です。このタスクを削除する前に、子タスクも削除してください。");
+        } else {
+            // 編集結果をフロントエンド, バックエンド、両者に反映
+            // フロントエンドはキャッシュ(data)を変更
+            // バックエンドはサーバーにajaxでアクセスして変更
+            DeleteData(event);
+            // メニューを隠す
+            $('.dropdwn').hide();
+            changeTree();
+            // ページを再読み込み
+            // window.location.reload(false);
+        }
+        
     });
     
     $('#updateTask').off('click');

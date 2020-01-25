@@ -8,7 +8,9 @@
             <ul style="color:#333;">
                 <li>
                     {!! link_to_route('tasks.tree', $project->content, ['id'=>$project->id]) !!}
-                    
+                    <div>
+                        達成率：{{ $tasksCompleted[$project->id] }}%
+                    </div>
                     <ul>
                         @foreach($tasksObject[$project->id] as $task)
                             <li>
