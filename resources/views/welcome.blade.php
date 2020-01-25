@@ -2,7 +2,7 @@
 
 @section('content')
     @if (Auth::check())
-        <p>{{ Auth::user()->name }}さんのタスクリスト</p>
+        <p>{{ Auth::user()->name }}さんのやることリスト</p>
         {{-- projectと選択されたtaskの一覧を表示 --}}
         @foreach ($projects as $project)
             <ul style="color:#333;">
@@ -12,6 +12,12 @@
                     <ul>
                         @foreach($tasksObject[$project->id] as $task)
                             <li>
+                                {{--フィールド名、value, checked?、属性--}}
+                                @if ($task->selected)
+                                    {{ Form::checkbox($project->id, $task->id, true, ['class'=>'check']) }}
+                                @else
+                                    {{ Form::checkbox($project->id, $task->id, false, ['class'=>'check']) }}
+                                @endif
                                 {{ $task->content }}
                             </li>
                         @endforeach

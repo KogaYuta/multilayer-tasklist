@@ -87,7 +87,7 @@
 }
 
 .selected {
-  fill: lime;
-  stroke: lime;
+  fill: red;
+  stroke: red;
   stroke-width: 2px;
 }

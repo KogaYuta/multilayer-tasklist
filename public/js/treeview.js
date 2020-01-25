@@ -361,49 +361,7 @@ const UpdateData = (e) => {
     ajaxUpdate(id, content, project_id);
 };
 
-const ajaxSelect = (id) => {
-    // AjaxでTasksControllerのstoreメソッドを呼ぶ
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        url: 'ajax/',
-        type: 'POST',
-        data: {'id':id,  '_method': 'POST', status:"select"},
-    })
-    // Ajaxリクエストが成功した場合
-    .done(function(data) {
-        // selected = 1のtaskのスタイルを変更する処理
-    })
-    // Ajaxリクエストが失敗した場合
-    .fail(function(data) {
-        alert(data.responseJSON);
-    });
-};
 
-const SelectData = (e) => {
-    // e : D3.jsのイベントオブジェクト
-    
-    const temp = prepareChangeData(e);
-    const id = temp.task.id;
-    const ind = temp.ind;
-    
-    let n = ind.length;
-    let currentData = data; //dataはグローバル変数
-    
-    console.log("ind",ind);
-    console.log("n",n);
-    
-    // 選択したタスクオブジェクトを取得する
-    for(let i=1;i<n;i++){
-        currentData = currentData.children[ind[i]];
-    }
-    
-    // dataのスタイルを変更
-    
-    
-    ajaxSelect(id);
-};
 
 
 // ドロップダウンメニューのスタイルを変更
@@ -484,21 +442,6 @@ const EventDropdwn = (event) => {
         // window.location.reload(false);
     });
     
-    // $('#selectTask').off('click');
-    // $('#selectTask').on('click',(e)=>{
-    //     // aタグのページ遷移を無効化
-    //     e.preventDefault();
-    //     // 編集結果をフロントエンド, バックエンド、両者に反映
-    //     // フロントエンドはキャッシュ(data)を変更
-    //     // バックエンドはサーバーにajaxでアクセスして変更
-    //     SelectData(event);
-    //     // メニューを隠す
-    //     $('.dropdwn').hide();
-    //     // 表示を変更する
-    //     changeTree();
-    //     // ページを再読み込み
-    //     window.location.reload(false);
-    // });
 };
 
 // nodeにノード追加イベントを追加する関数
@@ -509,17 +452,6 @@ const AddEvent = (node) => {
         .on('click', function(e) {// d3.jsの関数であることに注意
             console.log("node name",e.data.name);
             d3.select(this).select("rect").classed("active",true);
-            // スタイルの変更
-            d3.select("g").select("rect").classed("selected",
-                (d)=>{
-                    let name = d.data.name;
-                    let tasks = document.getElementById('js-getTasks').getAttribute('data-task');
-                    tasks = JSON.parse(tasks);
-                    let task = getTaskByName(tasks,name);
-                    return task.project_flag;
-                }
-            );
-            
             
             // dropdwnメニューの表示を整える
             styleDropdwn(e);
@@ -533,6 +465,22 @@ const AddEvent = (node) => {
             
         });
 };
+
+
+// 選択された(checkboxにチェックがつけられた)taskのスタイルを変更する
+const selectedStyle = () => {
+    // スタイルの変更
+    d3.selectAll("g").select("rect").classed("selected",
+        (d)=>{
+            let name = d.data.name;
+            let tasks = document.getElementById('js-getTasks').getAttribute('data-task');
+            tasks = JSON.parse(tasks);
+            let task = getTaskByName(tasks,name);
+            console.log("selected?",task.selected);
+            return task.selected;
+        }
+    );
+}
 
 // ノード間を結ぶ線を作る関数
 const createLink = () => {
@@ -598,6 +546,8 @@ const changeTree = () => {
     // ノードを作成
     createNode(temp);
     
+    selectedStyle();
+    
 };
 
 const showTree = () => {
@@ -606,6 +556,8 @@ const showTree = () => {
     
     // Nodeを作成
     createNode(temp);
+    
+    selectedStyle();
 };
 
 // mainの処理

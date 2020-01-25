@@ -30,6 +30,7 @@
         
         <script type="text/javascript" src="{{ secure_asset('/js/tasksTodata.js') }}"></script>
         <script type="text/javascript" src="{{ secure_asset('/js/treeview.js') }}"></script>
+        <script type="text/javascript" src="{{ secure_asset('/js/checkbox.js') }}"></script>
         <!--<script type="text/javascript" src="js/integrated.js"></script>-->
     </body>
 </html>

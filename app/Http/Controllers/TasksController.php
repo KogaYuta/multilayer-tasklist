@@ -190,7 +190,7 @@ class TasksController extends Controller
                 $project = $user->projects()->get()->find($project_id);
                 $task = $project->tasks()->get()->find($id);
                 
-                // タスクを削除
+                // タスクを更新
                 $task->content = $content;
                 $task->save();
                 
@@ -199,7 +199,25 @@ class TasksController extends Controller
                 return $tasks;
                 
             } else if ($status === 'select') {
+                $id = $request->id;
+                $project_id = $request->project_id;
                 
+                $user = \Auth::user();
+                $project = $user->projects()->get()->find($project_id);
+                $task = $project->tasks()->get()->find($id);
+                
+                // タスクの完了状態を更新
+                if ($task->selected) {
+                    $task->selected = false;
+                } else {
+                    $task->selected = true;
+                }
+                
+                $task->save();
+                
+                // 作成後の全タスクを返す
+                $tasks = $project->tasks()->orderBy('id', 'asc')->get();
+                return $tasks;
             }
         }
     }
