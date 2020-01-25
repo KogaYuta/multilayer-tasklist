@@ -1,22 +1,4 @@
-.link {
-  fill: none;
-  stroke: #555;
-  /*stroke-opacity: 0.4;*/
-  stroke-width: 2px;
-}
 
-.rect {
-  fill: turquoise;
-  stroke: turquoise;
-  rx: 4;
-  ry: 4;
-}
-
-/*選択されたノードの表示を変更するclass*/
-.active {
-  stroke: magenta;
-  stroke-width: 2px;
-}
 
 /*ドロップダウンメニュー用のスタイル*/
 .dropdwn{
@@ -80,4 +62,32 @@
 #menu li a:hover{
     background: #b3d7ff;
     color: rgb(65, 65, 65);
+}
+
+/*以下、ノードに付与するスタイル*/
+.link {
+  fill: none;
+  stroke: #555;
+  /*stroke-opacity: 0.4;*/
+  stroke-width: 2px;
+}
+
+.rect {
+  fill: turquoise;
+  stroke: turquoise;
+  rx: 4;
+  ry: 4;
+}
+
+/*選択されたノードの表示を変更するclass*/
+.active {
+  fill: magenta;
+  stroke: magenta;
+  stroke-width: 2px;
+}
+
+.selected {
+  fill: lime;
+  stroke: lime;
+  stroke-width: 2px;
 }

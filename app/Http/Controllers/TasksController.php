@@ -18,13 +18,44 @@ class TasksController extends Controller
             
             $projects = $user->projects()->with(['tasks'])->get();
             
+            $tasksObject = [];
+            
+            // 末端taskのみ取得したい
+            foreach ($projects as $project) {
+                $tasks = $project->tasks()->get();
+                $deleteIndex = array();
+                // 各taskが子を持つか検索
+                foreach ($tasks as $key=> $task) {
+                    $flag = false;
+                    // $taskが子を持つかどうか検索
+                    foreach ($tasks as $t) {
+                        if ($task->id == $t->parent_id){
+                            $flag = true;
+                        }
+                    }
+                    // taskが子を持つ場合
+                    if ($flag) {
+                        $deleteIndex[]=$key;
+                    }
+                }
+                
+                // deleteIndexに存在するtaskを削除
+                // その指標は欠番になることに注意
+                foreach($deleteIndex as $ind) {
+                    unset($tasks[$ind]);
+                }
+                
+                $tasksObject[$project->id]=$tasks;
+                
+            }
+            
             $data = [
                 'user' => $user,
                 'projects' => $projects,
+                'tasksObject' =>$tasksObject,
             ];
             
         }
-        
         return view('welcome', $data);
     }
     

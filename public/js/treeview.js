@@ -508,6 +508,18 @@ const AddEvent = (node) => {
         .attr('cursor', 'pointer')
         .on('click', function(e) {// d3.jsの関数であることに注意
             console.log("node name",e.data.name);
+            d3.select(this).select("rect").classed("active",true);
+            // スタイルの変更
+            d3.select("g").select("rect").classed("selected",
+                (d)=>{
+                    let name = d.data.name;
+                    let tasks = document.getElementById('js-getTasks').getAttribute('data-task');
+                    tasks = JSON.parse(tasks);
+                    let task = getTaskByName(tasks,name);
+                    return task.project_flag;
+                }
+            );
+            
             
             // dropdwnメニューの表示を整える
             styleDropdwn(e);

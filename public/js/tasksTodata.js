@@ -124,6 +124,15 @@ const getTaskById = (tasks, id) => {
     }
 };
 
+const getTaskByName = (tasks, name) => {
+    let n = tasks.length;
+    for (let i=0; i<n; i++) {
+        if (tasks[i].content == name) {
+            return tasks[i];
+        }
+    }
+};
+
 const convertIdtoTask = (tasks, id) => {
     for(let i=0;i<tasks.length;i++) {
         if (tasks[i].id == id) {
@@ -186,7 +195,6 @@ const createDepthObject = (tasks) => {
         depthObject[i].sort(compareFunc);
     }    
     
-    console.log("depthObject", depthObject);
     return depthObject;
 };
 

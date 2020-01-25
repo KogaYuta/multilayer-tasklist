@@ -10,7 +10,7 @@
                     {!! link_to_route('tasks.tree', $project->content, ['id'=>$project->id]) !!}
                     
                     <ul>
-                        @foreach($project->tasks as $task)
+                        @foreach($tasksObject[$project->id] as $task)
                             <li>
                                 {{ $task->content }}
                             </li>
