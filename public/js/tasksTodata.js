@@ -176,6 +176,7 @@ const createDepthObject = (tasks) => {
         }
     }
     
+    console.log("depthObject");
     return depthObject;
 };
 
