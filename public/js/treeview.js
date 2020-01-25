@@ -439,7 +439,6 @@ const EventDropdwn = (event) => {
     // eventはタスクをクリックした時のイベントオブジェクト(D3.js)
     $('#addTask').off('click');
     $('#addTask').on('click',(e)=>{
-        console.log("node name", event.data.name);
         // aタグのページ遷移を無効化
         e.preventDefault();
         // 編集結果をフロントエンド, バックエンド、両者に反映
@@ -508,6 +507,7 @@ const AddEvent = (node) => {
     node
         .attr('cursor', 'pointer')
         .on('click', function(e) {// d3.jsの関数であることに注意
+            console.log("node name",e.data.name);
             
             // dropdwnメニューの表示を整える
             styleDropdwn(e);
