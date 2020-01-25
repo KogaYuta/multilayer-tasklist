@@ -432,6 +432,8 @@ const EventDropdwn = (event) => {
         // 末端taskのみ削除許可
         if (flag) {
             alert("末端のタスクのみ削除可能です。このタスクを削除する前に、子タスクも削除してください。");
+            // メニューを隠す
+            $('.dropdwn').hide();
         } else {
             // 編集結果をフロントエンド, バックエンド、両者に反映
             // フロントエンドはキャッシュ(data)を変更
@@ -440,8 +442,6 @@ const EventDropdwn = (event) => {
             // メニューを隠す
             $('.dropdwn').hide();
             changeTree();
-            // ページを再読み込み
-            // window.location.reload(false);
         }
         
     });

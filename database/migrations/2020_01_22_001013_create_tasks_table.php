@@ -22,7 +22,7 @@ class CreateTasksTable extends Migration
              $table->integer('parent_id')->nullable();
              $table->timestamps();
             
-             $table->foreign('project_id')->references('id')->on('projects');
+             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
         });
     }
 
