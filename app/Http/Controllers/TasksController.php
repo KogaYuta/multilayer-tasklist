@@ -73,6 +73,11 @@ class TasksController extends Controller
                 
                 $n = count($tasksObject[$project->id]);
                 
+                // ゼロ除算を防ぐ
+                if ($n == 0) {
+                    $n = 1;
+                }
+                
                 $completeRatio = (int)($counter / $n * 100);
                 $tasksCompleted[$task->project_id]=$completeRatio;
             }

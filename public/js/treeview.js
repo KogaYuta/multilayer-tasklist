@@ -488,6 +488,9 @@ const AddEvent = (node) => {
 
 
 // 選択された(checkboxにチェックがつけられた)taskのスタイルを変更する
+// data, tasks間に齟齬があるとエラーを吐く
+// 新しいtaskがtasksに存在しないから
+// エラーを吐くが、処理に影響はないので無視
 const selectedStyle = () => {
     // スタイルの変更
     d3.selectAll("g").select("rect").classed("selected",
@@ -496,11 +499,10 @@ const selectedStyle = () => {
             let tasks = document.getElementById('js-getTasks').getAttribute('data-task');
             tasks = JSON.parse(tasks);
             let task = getTaskByName(tasks,name);
-            console.log("selected?",task.selected);
             return task.selected;
         }
     );
-}
+};
 
 // ノード間を結ぶ線を作る関数
 const createLink = () => {

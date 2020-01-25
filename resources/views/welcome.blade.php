@@ -4,29 +4,42 @@
     @if (Auth::check())
         <p>{{ Auth::user()->name }}さんのやることリスト</p>
         {{-- projectと選択されたtaskの一覧を表示 --}}
-        @foreach ($projects as $project)
-            <ul style="color:#333;">
-                <li>
+        <div style='display:flex'> {{--style='display:flex'--}}
+            @foreach ($projects as $project)
+                <div class="mr-4">
+                    {{--新しい表示--}}
                     {!! link_to_route('tasks.tree', $project->content, ['id'=>$project->id]) !!}
                     <div>
                         達成率：{{ $tasksCompleted[$project->id] }}%
                     </div>
-                    <ul>
+                    <table class="table table-bordered">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th scope="col" style="width:20px">check</th>
+                          <th scope="col">タスク名</th>
+                        </tr>
+                      </thead>
+                      <tbody>
                         @foreach($tasksObject[$project->id] as $task)
-                            <li>
-                                {{--フィールド名、value, checked?、属性--}}
-                                @if ($task->selected)
-                                    {{ Form::checkbox($project->id, $task->id, true, ['class'=>'check']) }}
-                                @else
-                                    {{ Form::checkbox($project->id, $task->id, false, ['class'=>'check']) }}
-                                @endif
-                                {{ $task->content }}
-                            </li>
+                            <tr>
+                                <th scope="col">
+                                    @if ($task->selected)
+                                        {{ Form::checkbox($project->id, $task->id, true, ['class'=>'check']) }}
+                                    @else
+                                        {{ Form::checkbox($project->id, $task->id, false, ['class'=>'check']) }}
+                                    @endif
+                                </th>
+                                <th scope="col">
+                                    {{ $task->content }}
+                                </th>
+                            </tr>
                         @endforeach
-                    </ul>
-                </li>
-            </ul>
-        @endforeach 
+                      </tbody>
+                    </table>
+                    {{--新しい表示--}}
+                </div>
+            @endforeach 
+        </div>
         
     @else
         <div class="center jumbotron">
