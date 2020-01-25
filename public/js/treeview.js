@@ -178,7 +178,7 @@ const ajaxStore = (taskTemp) => {
         console.log("data",data);
         console.log("data-task", temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
-        // window.location.reload(false);
+        window.location.reload(true);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -246,7 +246,7 @@ const ajaxDelete = (id,project_id) => {
         let temp = JSON.stringify(data);
         console.log("temp",temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
-        // window.location.reload(false);
+        window.location.reload(true);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -324,9 +324,9 @@ const ajaxUpdate = (id, content, project_id) => {
     .done(function(data) {
         console.log("success update");
         let temp = JSON.stringify(data);
-        console.log("temp",temp)
+        console.log("temp",temp);
         document.getElementById("js-getTasks").setAttribute('data-task', temp);
-        // window.location.reload(false);
+        window.location.reload(true);
     })
     // Ajaxリクエストが失敗した場合
     .fail(function(data) {
@@ -586,8 +586,6 @@ const changeTree = () => {
     // ノードを作成
     createNode(temp);
     
-    window.location.reload(true);
-        
 };
 
 const showTree = () => {
