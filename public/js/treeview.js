@@ -428,7 +428,6 @@ const styleDropdwn = (e) => {
     let inputWidth = rectSize.width-10;
     inputWidth = String(inputWidth) + "px";
     console.log("inputWidth",inputWidth);
-    $('.dropdwn_menu input').addClass("uoooo");
     $('.dropdwn_menu input').css("width", inputWidth);          
     
 };
@@ -440,6 +439,7 @@ const EventDropdwn = (event) => {
     // eventはタスクをクリックした時のイベントオブジェクト(D3.js)
     $('#addTask').off('click');
     $('#addTask').on('click',(e)=>{
+        console.log("node name", event.data.name);
         // aタグのページ遷移を無効化
         e.preventDefault();
         // 編集結果をフロントエンド, バックエンド、両者に反映
