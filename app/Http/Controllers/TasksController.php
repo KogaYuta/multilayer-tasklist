@@ -101,11 +101,11 @@ class TasksController extends Controller
         $user = \Auth::user();
         $project_id = $request->id;
         $project = $user->projects()->get()->find($project_id);
-        $taskinProject = $project->tasks()->get();
+        $tasks = $project->tasks()->get();
         
         $selected_parent_id = array();
         // selected=1のタスクを取得する
-        foreach($taskinProject as $task){
+        foreach($tasks as $task){
             if ($task->selected == true) {
                 // selected=1のタスクの親を取得し代入
                 if (in_array($task->parent_id, $selected_parent_id) == false) {
@@ -114,14 +114,12 @@ class TasksController extends Controller
             }
         }
         
-        // $tasks=$project->tasks()->get()->find($selected_parent_id);
-        
         // selected=1のタスクの親の子タスクは全てselected=1なのか
         foreach($selected_parent_id as $parent_id){
             // $parent_idをparent_idにもつtaskを格納
             $tasksChildren = array();
             // $parent_idをparent_idにもつtaskを取得
-            foreach($taskinProject as $task) {
+            foreach($tasks as $task) {
                 if ($parent_id == $task->parent_id) {
                     if ($task->parent_id != $task->id) {
                         $tasksChildren[]=$task;
@@ -146,12 +144,12 @@ class TasksController extends Controller
             $task->save();
         }
         
-        $taskinProject = $project->tasks()->get();
+        $tasks = $project->tasks()->get();
         
-        $tasksString = json_encode($taskinProject);
+        $tasksString = json_encode($tasks);
         
         return view('tasks.tree',[
-            'tasks' => $taskinProject,
+            'tasks' => $tasks,
             'tasksString' => $tasksString 
         ]);
     }
