@@ -97,14 +97,21 @@ class TasksController extends Controller
     public function tree(Request $request) {
         // $id : projectのid
         // projectに紐付くtaskを全て取得
-        $tasks = Task::all();
         
-        $taskinProject = array();
-        foreach ($tasks as $task) {
-            if ($request->id == $task->project_id) {
-                $taskinProject[] = $task;
-            }
-        }
+        // $tasks = Task::all();
+        
+        
+        // $taskinProject = array();
+        // foreach ($tasks as $task) {
+        //     if ($request->id == $task->project_id) {
+        //         $taskinProject[] = $task;
+        //     }
+        // }
+        
+        $user = \Auth::user();
+        $project_id = $request->id;
+        $project = $user->projects()->get()->find($project_id);
+        $taskinProject = $project->tasks()->get();
         
         $tasksString = json_encode($taskinProject);
         
