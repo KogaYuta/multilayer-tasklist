@@ -98,19 +98,54 @@ class TasksController extends Controller
         // $id : projectのid
         // projectに紐付くtaskを全て取得
         
-        // $tasks = Task::all();
-        
-        
-        // $taskinProject = array();
-        // foreach ($tasks as $task) {
-        //     if ($request->id == $task->project_id) {
-        //         $taskinProject[] = $task;
-        //     }
-        // }
-        
         $user = \Auth::user();
         $project_id = $request->id;
         $project = $user->projects()->get()->find($project_id);
+        $taskinProject = $project->tasks()->get();
+        
+        $selected_parent_id = array();
+        // selected=1のタスクを取得する
+        foreach($taskinProject as $task){
+            if ($task->selected == true) {
+                // selected=1のタスクの親を取得し代入
+                if (in_array($task->parent_id, $selected_parent_id) == false) {
+                    $selected_parent_id[]=$task->parent_id;
+                }
+            }
+        }
+        
+        // $tasks=$project->tasks()->get()->find($selected_parent_id);
+        
+        // selected=1のタスクの親の子タスクは全てselected=1なのか
+        foreach($selected_parent_id as $parent_id){
+            // $parent_idをparent_idにもつtaskを格納
+            $tasksChildren = array();
+            // $parent_idをparent_idにもつtaskを取得
+            foreach($taskinProject as $task) {
+                if ($parent_id == $task->parent_id) {
+                    if ($task->parent_id != $task->id) {
+                        $tasksChildren[]=$task;
+                    }
+                }
+            }
+            // 子タスクが１つでもselected=0ならば、falseになる
+            $flag = true;
+            foreach($tasksChildren as $task) {
+                if ($task->selected == false) {
+                    $flag = false;
+                }
+            }
+            $task = $project->tasks()->get()->find($parent_id);
+            //もし子タスクが全てselected=1ならば、そのtaskのselectedも1にする
+            if ($flag) {
+                $task->selected = true;
+            //１つでもselected=0の子タスクがあれば、親taskのselected=0
+            } else {
+                $task->selected = false;
+            }
+            $task->save();
+        }
+        
         $taskinProject = $project->tasks()->get();
         
         $tasksString = json_encode($taskinProject);
