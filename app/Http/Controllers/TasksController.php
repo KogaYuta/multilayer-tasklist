@@ -71,7 +71,9 @@ class TasksController extends Controller
                     }
                 }
                 
-                $n = count($tasksObject[$project->id]);
+                // $n = count($tasksObject[$project->id]);
+                $tasks = $project->tasks()->get();
+                $n = count($tasks);
                 
                 // ゼロ除算を防ぐ
                 if ($n == 0) {
