@@ -86,8 +86,9 @@
   stroke-width: 2px;
 }
 
+/*taskが完了した、という意味*/
 .selected {
-  fill: red;
-  stroke: red;
+  fill: #FF1A6F;
+  stroke: #FF1A6F;
   stroke-width: 2px;
 }
