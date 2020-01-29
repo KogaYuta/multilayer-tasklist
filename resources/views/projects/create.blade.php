@@ -3,7 +3,6 @@
 @section('content')
 
     <h1>プロジェクト新規作成ページ</h1>
-    {{ $project }}
 
     <div class="row">
         <div class="col-6">
