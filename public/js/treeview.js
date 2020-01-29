@@ -7,13 +7,13 @@ let height = document.querySelector("svg").clientHeight;
 //位置やサイズ情報
 const rectSize = {
     height: 40,
-    width: 160
+    width: 200
 };
 
 const basicSpace = {
     padding: 30,
     height: 60,
-    width: 200
+    width: 260
 };
 
 
@@ -334,6 +334,25 @@ const ajaxUpdate = (id, content, project_id) => {
     });
 };
 
+const getLen = (str) => {
+  var result = 0;
+  for(var i=0;i<str.length;i++){
+    var chr = str.charCodeAt(i);
+    if((chr >= 0x00 && chr < 0x81) ||
+       (chr === 0xf8f0) ||
+       (chr >= 0xff61 && chr < 0xffa0) ||
+       (chr >= 0xf8f1 && chr < 0xf8f4)){
+      //半角文字の場合は1を加算
+      result += 1;
+    }else{
+      //それ以外の文字の場合は2を加算
+      result += 2;
+    }
+  }
+  //結果を返す
+  return result;
+};
+
 const UpdateData = (e) => {
     const temp = prepareChangeData(e);
     const id = temp.task.id;
@@ -354,13 +373,22 @@ const UpdateData = (e) => {
     // メニューに入力されたタスク名を取得
     const content = $('.dropdwn_menu input').val();
     
+    // メニューに入力されている場合
     if (content != "") {
-        // dataのタスク名を変更
-        currentData.name = content;
-        $('.dropdwn_menu input').val("");
-        // サーバに変更をpost
-        // data-task属性も変更
-        ajaxUpdate(id, content, project_id);
+        // 入力内容が24文字以内の場合
+        if (getLen(content) < 24) {
+            // dataのタスク名を変更
+            currentData.name = content;
+            $('.dropdwn_menu input').val("");
+            // サーバに変更をpost
+            // data-task属性も変更
+            ajaxUpdate(id, content, project_id);
+        // 入力内容が20文字を超えている場合
+        } else {
+            alert("タスク名は全角12文字以内、半角24文字以内にしてください");
+        }
+        
+    // メニューに何も入力されていない場合
     } else {
         alert("タスク名を入力してください");
     }
@@ -368,10 +396,9 @@ const UpdateData = (e) => {
 };
 
 
-
-
 // ドロップダウンメニューのスタイルを変更
 const styleDropdwn = (e) => {
+    // e : D3.jsのイベントオブジェクト
     // menuの操作を決定する
     $('.dropdwn li').hover(function(){
         $("ul:not(:animated)", this).slideDown();
@@ -392,7 +419,20 @@ const styleDropdwn = (e) => {
     let inputWidth = rectSize.width-10;
     inputWidth = String(inputWidth) + "px";
     console.log("inputWidth",inputWidth);
-    $('.dropdwn_menu input').css("width", inputWidth);          
+    $('.dropdwn_menu input').css("width", inputWidth);  
+    
+    // inputタグの値に選択されたタスク名を入れる
+    const content = e.data.name;
+    const result = content.indexOf("node");
+    // 初回の編集の場合はinputに何も代入しない
+    // 二回目以降の編集はinputにノードの名前を代入する
+    // nodeが入っていなかった場合
+    if (result == -1) {
+        $('.dropdwn_menu input').val(content);
+    // nodeが入っていた場合
+    } else {
+        $('.dropdwn_menu input').val("");
+    }
     
 };
 
@@ -477,7 +517,6 @@ const AddEvent = (node) => {
         .attr('cursor', 'pointer')
         .on('click', function(e) {// d3.jsの関数であることに注意
             console.log("node name",e.data.name);
-            d3.select(this).select("rect").classed("active",true);
             
             // dropdwnメニューの表示を整える
             styleDropdwn(e);
