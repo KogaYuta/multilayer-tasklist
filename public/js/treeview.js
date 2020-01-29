@@ -305,7 +305,7 @@ const DeleteData = (e) => {
 };
 
 const ajaxUpdate = (id, content, project_id) => {
-    // AjaxでTasksControllerのstoreメソッドを呼ぶ
+    // AjaxでTasksControllerのajaxCRUDメソッドを呼ぶ
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -351,14 +351,20 @@ const UpdateData = (e) => {
         currentData = currentData.children[ind[i]];
     }
     
-    // dataのタスク名を変更
+    // メニューに入力されたタスク名を取得
     const content = $('.dropdwn_menu input').val();
-    currentData.name = content;
-    $('.dropdwn_menu input').val("");
     
-    // サーバに変更をpost
-    // data-task属性も変更
-    ajaxUpdate(id, content, project_id);
+    if (content != "") {
+        // dataのタスク名を変更
+        currentData.name = content;
+        $('.dropdwn_menu input').val("");
+        // サーバに変更をpost
+        // data-task属性も変更
+        ajaxUpdate(id, content, project_id);
+    } else {
+        alert("タスク名を入力してください");
+    }
+    
 };
 
 
