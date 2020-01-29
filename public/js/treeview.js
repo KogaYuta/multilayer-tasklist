@@ -395,6 +395,44 @@ const UpdateData = (e) => {
     
 };
 
+const ajaxChangeSelected = (id, project_id) => {
+    // AjaxでTasksControllerのajaxCRUDメソッドを呼ぶ
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: 'ajax',
+        type: 'POST',
+        data: {
+                'id':id, 
+                'project_id':project_id, 
+                '_method': 'POST', 
+                status:"select"
+        },
+    })
+    // Ajaxリクエストが成功した場合
+    .done(function(data) {
+        console.log("success change Selected");
+        let temp = JSON.stringify(data);
+        console.log("temp",temp);
+        document.getElementById("js-getTasks").setAttribute('data-task', temp);
+        window.location.reload(true);
+    })
+    // Ajaxリクエストが失敗した場合
+    .fail(function(data) {
+        alert(data.responseJSON);
+    });
+};
+
+const changeSelected = (e) => {
+    const temp = prepareChangeData(e);
+    const id = temp.task.id;
+    const project_id = temp.task.project_id;
+    
+    ajaxChangeSelected(id, project_id);
+    
+};
+
 
 // ドロップダウンメニューのスタイルを変更
 const styleDropdwn = (e) => {
@@ -500,6 +538,22 @@ const EventDropdwn = (event) => {
         // フロントエンドはキャッシュ(data)を変更
         // バックエンドはサーバーにajaxでアクセスして変更
         UpdateData(event);
+        // メニューを隠す
+        $('.dropdwn').hide();
+        // 表示を変更する
+        changeTree();
+        // ページを再読み込み
+        // window.location.reload(false);
+    });
+    
+    $('#changeTask').off('click');
+    $('#changeTask').on('click',(e)=>{
+        // aタグのページ遷移を無効化
+        e.preventDefault();
+        // 編集結果をフロントエンド, バックエンド、両者に反映
+        // フロントエンドはキャッシュ(data)を変更
+        // バックエンドはサーバーにajaxでアクセスして変更
+        changeSelected(event);
         // メニューを隠す
         $('.dropdwn').hide();
         // 表示を変更する
