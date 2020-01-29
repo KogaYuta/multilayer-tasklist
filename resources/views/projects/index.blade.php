@@ -15,6 +15,7 @@
                   <th scope="col">プロジェクト名</th>
                   <th scope="col">編集</th>
                   <th scope="col">削除</th>
+                  <th scope="col">タスクツリーの編集</th>
                 </tr>
               </thead>
               <tbody>
@@ -30,6 +31,9 @@
                             {!! Form::model($project, ['route' => ['projects.destroy', $project->id], 'method' => 'delete']) !!}
                                 {!! Form::submit('削除', ['class' => 'btn btn-danger']) !!}
                             {!! Form::close() !!}
+                        </td>
+                        <td>
+                            {!! link_to_route('tasks.tree', 'タスクツリーの編集', ['id'=>$project->id], ['class' => 'btn btn-success'],['class'=>'mr-4']) !!}
                         </td>
                     </tr>
                 @endforeach
