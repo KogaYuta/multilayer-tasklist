@@ -98,51 +98,150 @@ class TasksController extends Controller
         // $id : projectのid
         // projectに紐付くtaskを全て取得
         
-        $user = \Auth::user();
-        $project_id = $request->id;
-        $project = $user->projects()->get()->find($project_id);
-        $tasks = $project->tasks()->get();
+        // $user = \Auth::user();
+        // $project_id = $request->id;
+        // $project = $user->projects()->get()->find($project_id);
+        // $tasks = $project->tasks()->get();
         
-        $selected_parent_id = array();
-        // selected=1のタスクを取得する
-        foreach($tasks as $task){
-            if ($task->selected == true) {
-                // selected=1のタスクの親を取得し代入
-                if (in_array($task->parent_id, $selected_parent_id) == false) {
-                    $selected_parent_id[]=$task->parent_id;
-                }
-            }
-        }
+        // $selected_parent_id = array();
+        // // selected=1のタスクの親idを取得する
+        // foreach($tasks as $task){
+        //     if ($task->selected == true) {
+        //         // selected=1のタスクの親を取得し代入
+        //         if (in_array($task->parent_id, $selected_parent_id) == false) {
+        //             $selected_parent_id[]=$task->parent_id;
+        //         }
+        //     }
+        // }
         
-        // selected=1のタスクの親の子タスクは全てselected=1なのか
-        foreach($selected_parent_id as $parent_id){
-            // $parent_idをparent_idにもつtaskを格納
-            $tasksChildren = array();
-            // $parent_idをparent_idにもつtaskを取得
-            foreach($tasks as $task) {
-                if ($parent_id == $task->parent_id) {
-                    if ($task->parent_id != $task->id) {
-                        $tasksChildren[]=$task;
+        $loop_flag = true;
+        $count = 0;
+        while ($loop_flag) {
+            $loop_flag = false;
+            
+            $user = \Auth::user();
+            $project_id = $request->id;
+            $project = $user->projects()->get()->find($project_id);
+            $tasks = $project->tasks()->get();
+            
+            // new version
+            $selected_parent_id = array();
+            // selected=1のタスクの親idを取得する
+            foreach($tasks as $task){
+                if ($task->selected == true) {
+                    // selected=1のタスクの親を取得し代入
+                    if (in_array($task->parent_id, $selected_parent_id) == false) {
+                        $selected_parent_id[]=$task->parent_id;
                     }
                 }
             }
-            // 子タスクが１つでもselected=0ならば、falseになる
-            $flag = true;
-            foreach($tasksChildren as $task) {
-                if ($task->selected == false) {
-                    $flag = false;
+            
+            $selected_parent_id = array();
+            // selected=1のタスクの親idを取得する
+            foreach($tasks as $task){
+                if ($task->selected == true) {
+                    // selected=1のタスクの親を取得し代入
+                    if (in_array($task->parent_id, $selected_parent_id) == false) {
+                        $selected_parent_id[]=$task->parent_id;
+                    }
                 }
             }
-            $task = $project->tasks()->get()->find($parent_id);
-            //もし子タスクが全てselected=1ならば、そのtaskのselectedも1にする
-            if ($flag) {
-                $task->selected = true;
-            //１つでもselected=0の子タスクがあれば、親taskのselected=0
-            } else {
-                $task->selected = false;
+            
+            // $selected_parent_idに格納された親taskについてforeach
+            // taskの子タスクが全てselected=1ならば、親taskもselected=1に設定する
+            foreach($selected_parent_id as $parent_id){
+                $debug_array[] = $parent_id;
+                // $parent_idをparent_idにもつtaskを格納
+                $tasksChildren = array();
+                // $parent_idをparent_idにもつtaskを取得
+                foreach($tasks as $task) {
+                    // 根taskは対象外
+                    if ($parent_id == $task->parent_id) {
+                        if ($task->parent_id != $task->id) {
+                            $tasksChildren[]=$task;
+                        }
+                    }
+                }
+                // 子タスクが１つでもselected=0ならば、falseになる
+                $flag = true;
+                foreach($tasksChildren as $task) {
+                    if ($task->selected == false) {
+                        $flag = false;
+                    }
+                }
+                
+                // 現在の親taskを取得
+                $task = $project->tasks()->get()->find($parent_id);
+                //もし子タスクが全てselected=1ならば、その親taskのselectedも1にする
+                if ($flag) {
+                    $selected = $task->selected;
+                    $task->selected = true;
+                    // 元々はselected=0なのに今回変更される場合
+                    // 他のtaskも変更が発生する可能性があるので、次もloopを回す
+                    if ($selected == false) {
+                        $loop_flag = true;
+                    }
+                //１つでもselected=0の子タスクがあれば、親taskのselected=0
+                } else {
+                    $task->selected = false;
+                }
+                // taskの変更を反映
+                $task->save();
             }
-            $task->save();
+            $count++;
         }
+        // dd($count);
+        
+        
+        // $selected_parent_id = array();
+        // // selected=1のタスクの親idを取得する
+        // foreach($tasks as $task){
+        //     if ($task->selected == true) {
+        //         // selected=1のタスクの親を取得し代入
+        //         if (in_array($task->parent_id, $selected_parent_id) == false) {
+        //             $selected_parent_id[]=$task->parent_id;
+        //         }
+        //     }
+        // }
+        
+        // // $selected_parent_idに格納された親taskについてforeach
+        // // taskの子タスクが全てselected=1ならば、親taskもselected=1に設定する
+        // foreach($selected_parent_id as $parent_id){
+        //     $debug_array[] = $parent_id;
+        //     // $parent_idをparent_idにもつtaskを格納
+        //     $tasksChildren = array();
+        //     // $parent_idをparent_idにもつtaskを取得
+        //     foreach($tasks as $task) {
+        //         // 根taskは対象外
+        //         if ($parent_id == $task->parent_id) {
+        //             if ($task->parent_id != $task->id) {
+        //                 $tasksChildren[]=$task;
+        //             }
+        //         }
+        //     }
+        //     // 子タスクが１つでもselected=0ならば、falseになる
+        //     $flag = true;
+        //     foreach($tasksChildren as $task) {
+        //         if ($task->selected == false) {
+        //             $flag = false;
+        //         }
+        //     }
+            
+        //     // 現在の親taskを取得
+        //     $task = $project->tasks()->get()->find($parent_id);
+        //     //もし子タスクが全てselected=1ならば、その親taskのselectedも1にする
+        //     if ($flag) {
+        //         $task->selected = true;
+        //     //１つでもselected=0の子タスクがあれば、親taskのselected=0
+        //     } else {
+        //         $task->selected = false;
+        //     }
+        //     // taskの変更を反映
+        //     $task->save();
+        //     // 親タスクの親タスクも変更するので、末尾に追加
+        //     array_push($selected_parent_id,$task->parent_id);
+        //     $selected_parent_id = array_values($selected_parent_id);
+        // }
         
         $tasks = $project->tasks()->get();
         
