@@ -42,16 +42,16 @@
                 @endforeach 
             </div>
         @else
-            <h1>まず新しいプロジェクトを作成しましょう!</h1>
+            <h2>やりたいこと、やることをプロジェクトとして作成しましょう</h2>
             {!! link_to_route('projects.create', '新規プロジェクトの作成', [], ['class' => 'btn btn-primary mb-2', 'style'=>'width:100%;height:50px;']) !!}
         @endif
         
     @else
         <div class="center jumbotron">
             <div class="text-center">
-                <h1>Welcome to the Multilayer Tasklist</h1>
-                {!! link_to_route('login', 'Login now!', [], ['class' => 'btn btn-lg btn-danger']) !!}
-                {!! link_to_route('signup.get', 'Sign up now!', [], ['class' => 'btn btn-lg btn-primary']) !!}
+                <h1>多階層ToDoリストへようこそ</h1>
+                {!! link_to_route('login', 'Login', [], ['class' => 'btn btn-lg btn-danger']) !!}
+                {!! link_to_route('signup.get', 'Sign up', [], ['class' => 'btn btn-lg btn-primary']) !!}
             </div>
         </div>
     @endif

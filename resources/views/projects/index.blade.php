@@ -2,7 +2,7 @@
 
 @section('content')
     @if (Auth::check())
-        <h1>{{ Auth::user()->name }}さん、今日も頑張りましょう!</h1>
+        <h2>{{ Auth::user()->name }}さん、今日も頑張りましょう!</h2>
         
         {!! link_to_route('projects.create', '新規プロジェクトの作成', [], ['class' => 'btn btn-primary mb-2', 'style'=>'width:100%;height:50px;']) !!}
         
@@ -44,7 +44,7 @@
         @else
         
             {{--projectがない場合は、projectを作るように促す--}}
-            <p>新しいプロジェクトを作りましょう</p>
+            <p>やりたいこと、やることをプロジェクトとして作成しましょう</p>
         
         @endif
         
