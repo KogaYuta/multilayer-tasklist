@@ -4,7 +4,7 @@
 
 <h1>タスクツリー</h1>
 {{-- {{ $tasks }} --}} 
-<p>ノードをクリックしてプロジェクトを分解しましょう</p>
+<p>ノードをクリックしてください</p>
 
 @if (count($tasks) > 0)
     <span id="js-getTasks" data-task="{{ $tasksString }}"></span>
