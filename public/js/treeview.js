@@ -18,7 +18,7 @@ const basicSpace = {
 
 
 // 描画用のデータ変換
-const changeData = () => {
+const changeData(data) {
     let root = d3.hierarchy(data);
     let tree = d3.tree()
         .size([height, width-160]);
@@ -52,14 +52,14 @@ const defineX = (wholeData, eachData, spaceInfo) => {
 };
 
 //位置決め
-const definePos = (spaceInfo) => {
-    let treeData = changeData();
+const definePos(spaceInfo, data) => {
+    let treeData = changeData(data);
     treeData.each((d) => {
         d.y = spaceInfo.padding + d.depth * spaceInfo.width;
         const sum = defineX(treeData, d, spaceInfo);
         d.x = spaceInfo.padding + sum * spaceInfo.height;
     });
-    
+
     return treeData;
 };
 
@@ -68,21 +68,21 @@ const getObjectPath = (e) => {
     const n = e.depth+1;//子から遡る回数
     let path = [];
     let currentNode = e;
-  
+
     //配列としてパスを取得する
     for(let i=0;i<n-1;i++) {
         let currentName = currentNode.data.name;
         path.unshift(currentName); //配列の先頭に要素を追加
         currentNode = currentNode.parent;//１つ親ノードに遡る
     }
-  
+
     const pathLen = path.length;
-    let currentChildren = data.children;   
+    let currentChildren = data.children;
     let ind = [];
-  
+
     //全階層を探索する
     for(let i=0;i<pathLen;i++){
-    
+
         // 各階層を探索する
         for(let j=0;j<currentChildren.length;j++){
             //pathと同じ名前があれば、その指標を記録
@@ -90,7 +90,7 @@ const getObjectPath = (e) => {
                 ind.push(j);
             }
         }
-    
+
         // 次の階層に移動
         currentChildren = currentChildren[ind[i]].children;
     }
@@ -117,51 +117,30 @@ const prepareChangeData = (e) => {
     console.log("tasks",tasks);
     console.log("name",name);
     console.log("task",task);
-    
+
     // indを取得する
     const id = task.id;
     const parentIdList = createParentIdList(tasks);
     const dataTree = createDataTree(tasks, parentIdList);
     const depthObject = createDepthObject(tasks);
     const ind = getPathInd(tasks,dataTree, depthObject, id);
-    
+
     console.log("id", id);
     console.log("dataTree", dataTree);
     console.log("depthObject", depthObject);
     console.log("ind",ind);
-    
+
     const temp = {
         ind: ind,
         task: task,
         tasks: tasks,
     };
-    
+
     return temp;
 };
 
-const ajaxIndex = () => {
-    // AjaxでTasksControllerのstoreメソッドを呼ぶ
-    $.ajax({
-        url: 'ajax',
-        type: 'GET',
-    })
-    // Ajaxリクエストが成功した場合
-    .done(function(data) {
-        console.log("add success");
-        let temp = JSON.stringify(data);
-        console.log("data",data);
-        console.log("data-task", temp);
-        document.getElementById("js-getTasks").setAttribute('data-task', temp);
-    })
-    // Ajaxリクエストが失敗した場合
-    .fail(function(data) {
-        console.log("add error");
-        alert(data.responseJSON);
-    });
-};
-
 // ajaxでstoreメソッドを実行する関数
-const ajaxStore = (taskTemp) => {
+const ajaxStore(taskTemp, data){
     // AjaxでTasksControllerのstoreメソッドを呼ぶ
     $.ajax({
         headers: {
@@ -190,19 +169,19 @@ const ajaxStore = (taskTemp) => {
 
 //dataに要素を追加する関数
 //サーバーにもデータを登録する関数
-const AddData = (e) => {
+const AddData(e, data){
     const temp = prepareChangeData(e);
     const task = temp.task;
     const ind = temp.ind;
-    
+
     const n = ind.length;
     let currentData = data; //dataはグローバル変数
-    
+
     // 最初はプロジェクトノードを示し、必ず0なので無視する
     for(let i=1;i<n;i++){
         currentData = currentData.children[ind[i]];
     }
-    
+
     //dataにノードを追加
     //直接dataにアクセスできないので、currentDataからアクセス
     const content = "node"+Math.floor((Math.random()*100000));
@@ -211,9 +190,9 @@ const AddData = (e) => {
     } else {
         currentData['children'] = [{"name": content}];
     }
-    
+
     console.log("temp",temp);
-    
+
     // サーバーに渡すオブジェクト
     const taskTemp = {
                         project_id: task.project_id,
@@ -222,15 +201,14 @@ const AddData = (e) => {
                         project_flag : 0,
                         selected : 0
     };
-    
+
     // ajaxでサーバーに登録
-    ajaxStore(taskTemp);
-    // ajaxIndex();
-    
+    ajaxStore(taskTemp, data);
+
 };
 
 // ajaxでdeleteメソッドを実行する関数
-const ajaxDelete = (id,project_id) => {
+const ajaxDelete(id,project_id,data){
     // AjaxでTasksControllerのstoreメソッドを呼ぶ
     $.ajax({
         headers: {
@@ -255,15 +233,15 @@ const ajaxDelete = (id,project_id) => {
 };
 
 
-const DeleteData = (e) => {
+const DeleteData(e,data){
     const temp = prepareChangeData(e);
     const id = temp.task.id;
     const project_id = temp.task.project_id;
     const ind = temp.ind;
-    
+
     let n = ind.length;
     let currentData = data; //dataはグローバル変数
-    
+
     // 最初はプロジェクトノードを示し、必ず0なので無視する
     // 選択したノードが格納されている配列を取得する
     let l = 0;
@@ -271,21 +249,21 @@ const DeleteData = (e) => {
         if (i == n-1) {
             // 同階層に存在するタスクの数
             l = currentData.children.length;
-            
+
             if (l != 1) {
                 // 同階層に複数タスクが存在する場合は、そのタスクが存在する配列を返す
                 // １つしかない場合は、親タスクのオブジェクトを返す
                 currentData = currentData.children;
-            } 
+            }
         } else {
             currentData = currentData.children[ind[i]];
         }
     }
-    
+
     console.log("id",id);
     console.log("ind", ind);
     console.log("currentData before delete",currentData);
-    
+
     // dataからタスクを削除
     if (l == 1) {
         // currentDataは親タスクのオブジェクト
@@ -294,17 +272,17 @@ const DeleteData = (e) => {
         // currentDataは選択されたタスクが含まれる配列
         // currentIndは削除対象のタスクのindex
         let currentInd = ind.slice(-1)[0];
-        
+
         currentData.splice(currentInd,1);
     }
-    
+
     console.log("currentData after delete", currentData);
-    
-    ajaxDelete(id, project_id);
-    
+
+    ajaxDelete(id, project_id, data);
+
 };
 
-const ajaxUpdate = (id, content, project_id) => {
+const ajaxUpdate(id, content, project_id,data){
     // AjaxでTasksControllerのajaxCRUDメソッドを呼ぶ
     $.ajax({
         headers: {
@@ -313,10 +291,10 @@ const ajaxUpdate = (id, content, project_id) => {
         url: 'ajax',
         type: 'POST',
         data: {
-                'id':id, 
-                'content':content, 
-                'project_id':project_id, 
-                '_method': 'POST', 
+                'id':id,
+                'content':content,
+                'project_id':project_id,
+                '_method': 'POST',
                 status:"update"
         },
     })
@@ -353,26 +331,26 @@ const getLen = (str) => {
   return result;
 };
 
-const UpdateData = (e) => {
+const UpdateData(e,data){
     const temp = prepareChangeData(e);
     const id = temp.task.id;
     const ind = temp.ind;
     const project_id = temp.task.project_id;
-    
+
     let n = ind.length;
     let currentData = data; //dataはグローバル変数
-    
+
     console.log("ind",ind);
     console.log("n",n);
-    
+
     // 選択したタスクオブジェクトを取得する
     for(let i=1;i<n;i++){
         currentData = currentData.children[ind[i]];
     }
-    
+
     // メニューに入力されたタスク名を取得
     const content = $('.dropdwn_menu input').val();
-    
+
     // メニューに入力されている場合
     if (content != "") {
         // 入力内容が24文字以内の場合
@@ -382,20 +360,20 @@ const UpdateData = (e) => {
             $('.dropdwn_menu input').val("");
             // サーバに変更をpost
             // data-task属性も変更
-            ajaxUpdate(id, content, project_id);
+            ajaxUpdate(id, content, project_id,data);
         // 入力内容が20文字を超えている場合
         } else {
             alert("タスク名は全角12文字以内、半角24文字以内にしてください");
         }
-        
+
     // メニューに何も入力されていない場合
     } else {
         alert("タスク名を入力してください");
     }
-    
+
 };
 
-const ajaxChangeSelected = (id, project_id) => {
+const ajaxChangeSelected(id, project_id,data){
     // AjaxでTasksControllerのajaxCRUDメソッドを呼ぶ
     $.ajax({
         headers: {
@@ -404,9 +382,9 @@ const ajaxChangeSelected = (id, project_id) => {
         url: 'ajax',
         type: 'POST',
         data: {
-                'id':id, 
-                'project_id':project_id, 
-                '_method': 'POST', 
+                'id':id,
+                'project_id':project_id,
+                '_method': 'POST',
                 status:"select"
         },
     })
@@ -424,13 +402,13 @@ const ajaxChangeSelected = (id, project_id) => {
     });
 };
 
-const changeSelected = (e) => {
+const changeSelected(e,data){
     const temp = prepareChangeData(e);
     const id = temp.task.id;
     const project_id = temp.task.project_id;
-    
-    ajaxChangeSelected(id, project_id);
-    
+
+    ajaxChangeSelected(id, project_id,data);
+
 };
 
 
@@ -443,8 +421,8 @@ const styleDropdwn = (e) => {
     }, function(){
         $("ul.dropdwn_menu",this).slideUp();
     });
-    
-    
+
+
     // dropdwnメニューのスタイルを決定
     $('.dropdwn').css("width", rectSize.width);
     const pos = $('svg').offset();
@@ -452,13 +430,13 @@ const styleDropdwn = (e) => {
     let left = pos.left + e.y;
     $('#menu').css("top", top)
               .css("left", left);
-              
+
     // updateのためのinputタグのスタイルを整える
     let inputWidth = rectSize.width-10;
     inputWidth = String(inputWidth) + "px";
     console.log("inputWidth",inputWidth);
-    $('.dropdwn_menu input').css("width", inputWidth);  
-    
+    $('.dropdwn_menu input').css("width", inputWidth);
+
     // inputタグの値に選択されたタスク名を入れる
     const content = e.data.name;
     const result = content.indexOf("node");
@@ -471,13 +449,13 @@ const styleDropdwn = (e) => {
     } else {
         $('.dropdwn_menu input').val("");
     }
-    
+
 };
 
 //ドロップダウンメニューにイベントを登録
 // 再読みこみしないとメニューを開いたまま固まるエラーが発生している
 // なのでlocation.reload()によりページを再読み込みしている
-const EventDropdwn = (event) => {
+const EventDropdwn(event,data){
     // eventはタスクをクリックした時のイベントオブジェクト(D3.js)
     $('#addTask').off('click');
     $('#addTask').on('click',(e)=>{
@@ -487,19 +465,19 @@ const EventDropdwn = (event) => {
         // フロントエンドはキャッシュ(data)を変更
         // バックエンドはサーバーにajaxでアクセスして変更
         // data-taskも変更
-        AddData(event);
+        AddData(event, data);
         // メニューを隠す
         $('.dropdwn').hide();
         changeTree();
         // ページを再読み込み
         // window.location.reload(false);
     });
-    
+
     $('#deleteTask').off('click');
     $('#deleteTask').on('click',(e)=>{
         // aタグのページ遷移を無効化
         e.preventDefault();
-        
+
         // 子タスクが存在するか確認
         // 選択されたtaskに子タスクが存在すればtrue
         let flag = false;
@@ -512,7 +490,7 @@ const EventDropdwn = (event) => {
                 flag = true;
             }
         }
-        
+
         // 末端taskのみ削除許可
         if (flag) {
             alert("末端のタスクのみ削除可能です。このタスクを削除する前に、子タスクも削除してください。");
@@ -522,14 +500,14 @@ const EventDropdwn = (event) => {
             // 編集結果をフロントエンド, バックエンド、両者に反映
             // フロントエンドはキャッシュ(data)を変更
             // バックエンドはサーバーにajaxでアクセスして変更
-            DeleteData(event);
+            DeleteData(event,data);
             // メニューを隠す
             $('.dropdwn').hide();
             changeTree();
         }
-        
+
     });
-    
+
     $('#updateTask').off('click');
     $('#updateTask').on('click',(e)=>{
         // aタグのページ遷移を無効化
@@ -537,7 +515,7 @@ const EventDropdwn = (event) => {
         // 編集結果をフロントエンド, バックエンド、両者に反映
         // フロントエンドはキャッシュ(data)を変更
         // バックエンドはサーバーにajaxでアクセスして変更
-        UpdateData(event);
+        UpdateData(event,data);
         // メニューを隠す
         $('.dropdwn').hide();
         // 表示を変更する
@@ -545,7 +523,7 @@ const EventDropdwn = (event) => {
         // ページを再読み込み
         // window.location.reload(false);
     });
-    
+
     $('#changeTask').off('click');
     $('#changeTask').on('click',(e)=>{
         // aタグのページ遷移を無効化
@@ -553,7 +531,7 @@ const EventDropdwn = (event) => {
         // 編集結果をフロントエンド, バックエンド、両者に反映
         // フロントエンドはキャッシュ(data)を変更
         // バックエンドはサーバーにajaxでアクセスして変更
-        changeSelected(event);
+        changeSelected(event,data);
         // メニューを隠す
         $('.dropdwn').hide();
         // 表示を変更する
@@ -561,27 +539,27 @@ const EventDropdwn = (event) => {
         // ページを再読み込み
         // window.location.reload(false);
     });
-    
+
 };
 
 // nodeにノード追加イベントを追加する関数
 // showTreeから呼ばれる
-const AddEvent = (node) => {
+const AddEvent(node,data){
     node
         .attr('cursor', 'pointer')
         .on('click', function(e) {// d3.jsの関数であることに注意
             console.log("node name",e.data.name);
-            
+
             // dropdwnメニューの表示を整える
             styleDropdwn(e);
-            
+
             // dropdwnメニューにCRUD処理を登録
-            EventDropdwn(e);
-            
+            EventDropdwn(e,data);
+
             $('.dropdwn').toggle();
-            
+
             console.log("data",data);
-            
+
         });
 };
 
@@ -604,10 +582,10 @@ const selectedStyle = () => {
 };
 
 // ノード間を結ぶ線を作る関数
-const createLink = () => {
-    let root = changeData();
-    root = definePos(basicSpace);
-    
+const createLink(data){
+    let root = changeData(data);
+    root = definePos(basicSpace, data);
+
     let g = d3.select("svg").append("g");
     let link = g.selectAll(".link")
         .data(root.descendants().slice(1))
@@ -620,22 +598,22 @@ const createLink = () => {
                 " " + (d.parent.y + rectSize.width + (basicSpace.width - rectSize.width) / 2) + "," + d.parent.x +
                 " " + (d.parent.y + rectSize.width) + "," + d.parent.x
         })
-        .attr("transform", function (d) { return "translate(0," + rectSize.height / 2 + ")"; }); 
-        
+        .attr("transform", function (d) { return "translate(0," + rectSize.height / 2 + ")"; });
+
     const temp = {
         g: g,
         root:root
     };
-    
+
     return  temp;
 };
 
 
 // ノードを作る関数
-const createNode = (temp) => {
+const createNode(temp,data){
     let root = temp.root;
     let g = temp.g;
-    
+
     let node = g.selectAll(".node")
         .data(root.descendants())
         .enter()
@@ -643,50 +621,56 @@ const createNode = (temp) => {
         .attr("class", "node")
         .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; })
         .attr("data-name", function (d) { return d.data.name; }); // 追加
-        
+
     node.append("rect")
         .attr("width", rectSize.width)
         .attr("height", rectSize.height)
         .attr("class", "rect");
-        
+
     node.append("text")
         .text(function (d) { return d.data.name; })
         .attr("transform", "translate(" + 10 + "," + 15 + ")");
-        
-    AddEvent(node);
+
+    AddEvent(node,data);
 };
 
 // dataに応じてツリーの表示を変更する関数
-const changeTree = () => {
+const changeTree(){
+    // DBのデータを格納したタグがあるので、そこからtasksを取得する
+    let tasks = $('#js-getTasks').data().task;
+    let data = createData(tasks);
     //今までの表示を削除
     $('svg > g').remove();
-    
+
     // ノードを結ぶ線を作成
-    let temp = createLink();
-    
+    let temp = createLink(data);
+
     // ノードを作成
-    createNode(temp);
-    
+    createNode(temp,data);
+
     selectedStyle();
-    
+
 };
 
-const showTree = () => {
+const showTree(){
+    // DBのデータを格納したタグがあるので、そこからtasksを取得する
+    let tasks = $('#js-getTasks').data().task;
+    let data = createData(tasks);
     // Nodeを結ぶLinkの作成
-    let temp = createLink();
-    
+    let temp = createLink(data);
+
     // Nodeを作成
-    createNode(temp);
-    
+    createNode(temp,data);
+
     selectedStyle();
+
+    // 変更が反映されるのか検証
+    console.log("success load!!");
 };
 
 // mainの処理
 // data作成
 let start = performance.now();
-let tasks = $('#js-getTasks').data().task;
-let data = createData(tasks);
-console.log("data:",data);
 let end = performance.now();
 let time = "calc time: " + (end - start) + "ms";
 console.log(time);
